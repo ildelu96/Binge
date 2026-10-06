@@ -305,7 +305,7 @@
     
     <div class="ai-box">
       <div class="ai-title">🤖 Suggerimenti Personali IA</div>
-      <div style="font-size:0.8rem; color: #cbd5e1;">Inserisci un anime che ti è piaciuto:</div>
+      <div style="font-size:0.8rem; color: #cbd5e1;">Inserisci un anime piaciuto per trovare titoli simili:</div>
       <div class="ai-input-group">
         <input type="text" id="ai-anime-input" class="ai-input" placeholder="Es. Attack on Titan, Solo Leveling...">
         <button class="ai-btn" onclick="getAIRecommendations()">Trova Simili ✨</button>
@@ -316,23 +316,11 @@
       <input type="text" id="search-input" class="search-input" placeholder="🔍 Cerca qualsiasi anime..." oninput="handleSearch()">
       
       <div class="filter-group">
-        <select id="genre-select" class="filter-select" onchange="applyFilters()">
-          <option value="">🎭 Tutti i Generi</option>
-          <option value="Action">Azione</option>
-          <option value="Adventure">Avventura</option>
-          <option value="Comedy">Commedia</option>
-          <option value="Drama">Drammatico</option>
-          <option value="Fantasy">Fantasy</option>
-          <option value="Romance">Romantico</option>
-          <option value="Sci-Fi">Sci-Fi</option>
-          <option value="Slice of Life">Slice of Life</option>
-        </select>
-
-        <select id="format-select" class="filter-select" onchange="applyFilters()">
+        <select id="type-select" class="filter-select" onchange="applyFilters()">
           <option value="">🎬 Tutti i Formati</option>
-          <option value="TV">Serie TV</option>
-          <option value="MOVIE">Film / Movie</option>
-          <option value="OVA">OVA / Speciale</option>
+          <option value="tv">Serie TV</option>
+          <option value="movie">Film / Movie</option>
+          <option value="ova">OVA / Speciale</option>
         </select>
       </div>
     </div>
@@ -340,7 +328,7 @@
     <div class="view-tabs">
       <button class="tab-btn active" onclick="switchTab('ALL', this)">🔥 Tutti</button>
       <button class="tab-btn" onclick="switchTab('READY', this)">🟢 Pronti per il Binge</button>
-      <button class="tab-btn" onclick="switchTab('AIRING', this)">🔵 / 🟠 In Corso / Simulcast</button>
+      <button class="tab-btn" onclick="switchTab('AIRING', this)">🔵 In Corso</button>
       <button class="tab-btn" onclick="switchTab('ENDED', this)">🔴 Conclusi</button>
       <button class="tab-btn" onclick="switchTab('UPCOMING', this)">📅 Prossimi</button>
     </div>
@@ -387,145 +375,91 @@
     function getAnimeBadge(anime) {
       if (!anime) return { class: 'badge-blue', label: 'ANIME', code: 'ALL' };
       
-      const status = anime.status;
-      const relations = anime.relations && anime.relations.edges ? anime.relations.edges : [];
-      const hasSequel = relations.some(edge => edge.relationType === 'SEQUEL');
-
-      if (status === 'NOT_YET_RELEASED') {
+      const status = (anime.status || '').toLowerCase();
+      
+      if (status.includes('not yet') || status.includes('upcoming')) {
         return { class: 'badge-purple', label: 'PROSSIMAMENTE', code: 'UPCOMING' };
       }
-      if (status === 'RELEASING') {
+      if (status.includes('currently') || status.includes('airing')) {
         return { class: 'badge-blue', label: 'IN CORSO', code: 'AIRING' };
       }
-      if (status === 'FINISHED') {
-        if (hasSequel) {
-          return { class: 'badge-yellow', label: 'SEQUEL CONF.', code: 'READY' };
-        }
-        return { class: 'badge-green', label: 'STAGIONE FINITA', code: 'READY' };
+      if (status.includes('finished') || status.includes('complete')) {
+        return { class: 'badge-green', label: 'COMPLETO', code: 'READY' };
       }
-      if (status === 'CANCELLED' || status === 'HIATUS') {
-        return { class: 'badge-red', label: 'SOSPESO', code: 'ENDED' };
-      }
-      return { class: 'badge-red', label: 'FINITO', code: 'ENDED' };
+      return { class: 'badge-red', label: 'CONCLUSO', code: 'ENDED' };
     }
 
-    function fetchAnime(page = 1, searchQuery = "", genre = "", format = "", append = false) {
-      if (isLoading || (!hasNextPage && append)) return;
-      
+    function parseJikanData(items) {
+      return items.map(item => ({
+        id: item.mal_id,
+        title: item.title,
+        coverImage: item.images?.jpg?.large_image_url || item.images?.jpg?.image_url,
+        status: item.status,
+        synopsis: item.synopsis || "Nessuna descrizione disponibile.",
+        genres: item.genres ? item.genres.map(g => g.name).join(', ') : ''
+      }));
+    }
+
+    function fetchAnime(page = 1, searchQuery = "", format = "", append = false) {
+      if (isLoading) return;
       isLoading = true;
       document.getElementById('loader').style.display = 'block';
 
-      const query = `
-      query ($page: Int, $perPage: Int, $search: String, $genre: String, $format: MediaFormat) {
-        Page (page: $page, perPage: $perPage) {
-          pageInfo {
-            hasNextPage
-          }
-          media (type: ANIME, search: $search, genre: $genre, format: $format, sort: [POPULARITY_DESC]) {
-            id
-            title { english romaji }
-            coverImage { extraLarge }
-            status
-            format
-            episodes
-            genres
-            description
-            relations { edges { relationType node { id status } } }
-          }
-        }
-      }`;
+      let url = `https://api.jikan.moe/v4/anime?page=${page}&limit=24&sfw=true`;
+      if (searchQuery) url += `&q=${encodeURIComponent(searchQuery)}`;
+      if (format) url += `&type=${format}`;
+      if (!searchQuery && !format) url = `https://api.jikan.moe/v4/top/anime?page=${page}&limit=24`;
 
-      const variables = {
-        page: page,
-        perPage: 40
-      };
+      fetch(url)
+        .then(res => res.json())
+        .then(resData => {
+          const list = resData.data || [];
+          hasNextPage = resData.pagination?.has_next_page || false;
+          const parsed = parseJikanData(list);
 
-      if (searchQuery) variables.search = searchQuery;
-      if (genre) variables.genre = genre;
-      if (format) variables.format = format;
-
-      fetch('https://graphql.anilist.co', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ query: query, variables: variables })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.data && data.data.Page) {
-          const pageInfo = data.data.Page.pageInfo;
-          const newAnime = data.data.Page.media || [];
-
-          hasNextPage = pageInfo.hasNextPage;
-          fetchedAnimeData = append ? [...fetchedAnimeData, ...newAnime] : newAnime;
-
+          fetchedAnimeData = append ? [...fetchedAnimeData, ...parsed] : parsed;
           renderGrid();
-        }
-        isLoading = false;
-        document.getElementById('loader').style.display = 'none';
-      })
-      .catch(err => {
-        console.error("Errore AniList:", err);
-        isLoading = false;
-        document.getElementById('loader').innerText = "❌ Errore durante il recupero dei dati.";
-      });
+          isLoading = false;
+          document.getElementById('loader').style.display = 'none';
+        })
+        .catch(err => {
+          console.error("Errore fetch, tentiamo il fallback:", err);
+          // Fallback a Kitsu API se Jikan va in Timeout o Rate-limit
+          fetchKitsuFallback(searchQuery);
+        });
+    }
+
+    function fetchKitsuFallback(searchQuery) {
+      let url = `https://kitsu.io/api/edge/anime?page[limit]=20`;
+      if (searchQuery) url += `&filter[text]=${encodeURIComponent(searchQuery)}`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(resData => {
+          const list = resData.data || [];
+          fetchedAnimeData = list.map(item => ({
+            id: item.id,
+            title: item.attributes.canonicalTitle,
+            coverImage: item.attributes.posterImage?.small,
+            status: item.attributes.status,
+            synopsis: item.attributes.synopsis,
+            genres: 'Anime'
+          }));
+          renderGrid();
+          isLoading = false;
+          document.getElementById('loader').style.display = 'none';
+        })
+        .catch(() => {
+          isLoading = false;
+          document.getElementById('loader').innerText = "❌ Impossibile caricare al momento. Riprova tra poco.";
+        });
     }
 
     function getAIRecommendations() {
       const input = document.getElementById('ai-anime-input').value.trim();
       if (!input) return;
-
-      isLoading = true;
-      document.getElementById('loader').style.display = 'block';
-
-      const query = `
-      query ($search: String) {
-        Media (search: $search, type: ANIME) {
-          recommendations(perPage: 30) {
-            nodes {
-              mediaRecommendation {
-                id
-                title { english romaji }
-                coverImage { extraLarge }
-                status
-                format
-                episodes
-                genres
-                description
-                relations { edges { relationType node { id status } } }
-              }
-            }
-          }
-        }
-      }`;
-
-      fetch('https://graphql.anilist.co', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ query: query, variables: { search: input } })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.data && data.data.Media && data.data.Media.recommendations) {
-          const recs = data.data.Media.recommendations.nodes
-            .filter(node => node && node.mediaRecommendation)
-            .map(node => node.mediaRecommendation);
-          
-          fetchedAnimeData = recs;
-          renderGrid();
-        }
-        isLoading = false;
-        document.getElementById('loader').style.display = 'none';
-      })
-      .catch(() => {
-        isLoading = false;
-        document.getElementById('loader').style.display = 'none';
-      });
+      currentPage = 1;
+      fetchAnime(1, input, "", false);
     }
 
     function renderGrid() {
@@ -546,19 +480,17 @@
 
       filtered.forEach(anime => {
         const badge = getAnimeBadge(anime);
-        const title = (anime.title && (anime.title.english || anime.title.romaji)) || 'Titolo Sconosciuto';
-        const cover = (anime.coverImage && anime.coverImage.extraLarge) || '';
 
         const card = document.createElement('div');
         card.className = 'anime-card';
         card.onclick = () => openModal(anime.id);
         card.innerHTML = `
           <div class="poster-container">
-            <img class="poster-img" src="${cover}" alt="${title}" loading="lazy">
+            <img class="poster-img" src="${anime.coverImage}" alt="${anime.title}" loading="lazy">
             <div class="status-badge ${badge.class}">${badge.label}</div>
           </div>
           <div class="card-info">
-            <div class="anime-title">${title}</div>
+            <div class="anime-title">${anime.title}</div>
           </div>
         `;
         grid.appendChild(card);
@@ -576,21 +508,16 @@
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
         currentPage = 1;
-        hasNextPage = true;
-        fetchedAnimeData = [];
         const query = document.getElementById('search-input').value.trim();
-        fetchAnime(1, query, document.getElementById('genre-select').value, document.getElementById('format-select').value, false);
-      }, 400);
+        fetchAnime(1, query, document.getElementById('type-select').value, false);
+      }, 500);
     }
 
     function applyFilters() {
       currentPage = 1;
-      hasNextPage = true;
-      fetchedAnimeData = [];
       const searchVal = document.getElementById('search-input').value.trim();
-      const genreVal = document.getElementById('genre-select').value;
-      const formatVal = document.getElementById('format-select').value;
-      fetchAnime(1, searchVal, genreVal, formatVal, false);
+      const formatVal = document.getElementById('type-select').value;
+      fetchAnime(1, searchVal, formatVal, false);
     }
 
     window.addEventListener('scroll', () => {
@@ -598,9 +525,8 @@
         if (!isLoading && hasNextPage) {
           currentPage++;
           const searchVal = document.getElementById('search-input').value.trim();
-          const genreVal = document.getElementById('genre-select').value;
-          const formatVal = document.getElementById('format-select').value;
-          fetchAnime(currentPage, searchVal, genreVal, formatVal, true);
+          const formatVal = document.getElementById('type-select').value;
+          fetchAnime(currentPage, searchVal, formatVal, true);
         }
       }
     });
@@ -610,9 +536,9 @@
       if(!anime) return;
 
       selectedAnimeId = id;
-      document.getElementById('modal-title').innerText = (anime.title && (anime.title.english || anime.title.romaji)) || '';
-      document.getElementById('modal-genres').innerText = anime.genres ? "Generi: " + anime.genres.join(", ") : "";
-      document.getElementById('modal-description').innerHTML = anime.description || "Descrizione non disponibile.";
+      document.getElementById('modal-title').innerText = anime.title;
+      document.getElementById('modal-genres').innerText = anime.genres ? "Generi: " + anime.genres : "";
+      document.getElementById('modal-description').innerText = anime.synopsis;
       
       const isSaved = savedList.some(item => item.id === id);
       document.getElementById('save-btn').innerText = isSaved ? "❌ Rimuovi dalla Lista" : "➕ Aggiungi alla Mia Lista";
@@ -681,11 +607,9 @@
 
     function resetToHome() {
       currentPage = 1;
-      hasNextPage = true;
       fetchedAnimeData = [];
       document.getElementById('search-input').value = '';
-      document.getElementById('genre-select').value = '';
-      document.getElementById('format-select').value = '';
+      document.getElementById('type-select').value = '';
       fetchAnime(1);
       toggleMenu();
     }
