@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BINGE 🍿 - Netflix Style</title>
+  <title>BINGE 🍿</title>
   <style>
     :root {
-      --bg-main: #141414;
-      --card-bg: #181818;
-      --text-main: #ffffff;
-      --text-muted: #aaaaaa;
-      --netflix-red: #e50914;
-      --badge-blue: #3b82f6;      
-      --badge-green: #10b981;     
+      --bg-main: #0f172a;       /* Sfondo azzurro scuro/notte */
+      --card-bg: #1e293b;       /* Schede azzurro tenue */
+      --text-main: #ffffff;      /* Testo principale bianco */
+      --text-muted: #94a3b8;    /* Testo secondario azzurro chiaro */
+      --accent-blue: #38bdf8;   /* Azzurro brillante */
+      --badge-blue: #0284c7;    
+      --badge-green: #10b981;   
       --badge-purple: #a855f7;
     }
 
@@ -27,7 +27,7 @@
     }
 
     header {
-      background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0) 100%);
       padding: 15px 4%;
       display: flex;
       align-items: center;
@@ -38,23 +38,24 @@
       transition: background 0.3s;
     }
 
-    header.scrolled { background: #141414; }
+    header.scrolled { background: var(--bg-main); }
 
     .logo {
       font-size: 1.6rem;
       font-weight: 900;
-      color: var(--netflix-red);
+      color: var(--accent-blue);
       letter-spacing: 1.5px;
+      cursor: pointer;
     }
 
     .menu-container { position: relative; }
 
     .menu-btn {
-      background: rgba(0,0,0,0.6);
+      background: rgba(30, 41, 59, 0.8);
       color: #fff;
-      border: 1px solid rgba(255,255,255,0.3);
+      border: 1px solid rgba(56, 189, 248, 0.4);
       padding: 6px 14px;
-      border-radius: 4px;
+      border-radius: 6px;
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
@@ -64,11 +65,12 @@
       display: none;
       position: absolute;
       right: 0; top: 40px;
-      background: #000;
-      border: 1px solid #333;
-      border-radius: 4px;
-      width: 200px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      width: 220px;
       z-index: 110;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
     }
 
     .dropdown-menu.show { display: block; }
@@ -78,9 +80,9 @@
       font-size: 0.85rem;
       color: #fff;
       cursor: pointer;
-      border-bottom: 1px solid #222;
+      border-bottom: 1px solid #334155;
     }
-    .dropdown-item:hover { background: #222; }
+    .dropdown-item:hover { background: #334155; }
 
     /* Controls Bar */
     .controls-container {
@@ -91,25 +93,16 @@
       flex-wrap: wrap;
     }
 
-    .search-input {
-      flex: 1;
-      min-width: 200px;
+    .search-input, .year-select {
       padding: 10px 15px;
-      background: #222;
-      border: 1px solid #444;
+      background: #1e293b;
+      border: 1px solid #334155;
       color: #fff;
-      border-radius: 4px;
+      border-radius: 6px;
       outline: none;
     }
 
-    .year-select {
-      padding: 10px;
-      background: #222;
-      border: 1px solid #444;
-      color: #fff;
-      border-radius: 4px;
-      outline: none;
-    }
+    .search-input { flex: 1; min-width: 200px; }
 
     /* Rows Layout */
     .row-container {
@@ -121,37 +114,42 @@
       font-size: 1.2rem;
       font-weight: 700;
       margin-bottom: 10px;
-      color: #e5e5e5;
+      color: #ffffff;
     }
 
     .row-posters {
       display: flex;
       overflow-x: auto;
       overflow-y: hidden;
-      gap: 10px;
+      gap: 12px;
       padding-bottom: 15px;
       scroll-behavior: smooth;
     }
 
     .row-posters::-webkit-scrollbar { height: 6px; }
-    .row-posters::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    .row-posters::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 
     .netflix-card {
       flex: 0 0 auto;
       width: 140px;
       position: relative;
-      border-radius: 4px;
+      border-radius: 6px;
       overflow: hidden;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
       background: var(--card-bg);
+      border: 1px solid #334155;
     }
 
     @media (min-width: 768px) {
       .netflix-card { width: 170px; }
     }
 
-    .netflix-card:hover { transform: scale(1.05); z-index: 10; }
+    .netflix-card:hover { 
+      transform: translateY(-4px); 
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+      z-index: 10; 
+    }
 
     .netflix-card img {
       width: 100%;
@@ -162,17 +160,6 @@
 
     @media (min-width: 768px) {
       .netflix-card img { height: 250px; }
-    }
-
-    .rank-number {
-      position: absolute;
-      bottom: -10px; left: -5px;
-      font-size: 3.5rem;
-      font-weight: 900;
-      color: #000;
-      -webkit-text-stroke: 2px var(--netflix-red);
-      line-height: 1;
-      pointer-events: none;
     }
 
     .status-badge {
@@ -192,51 +179,104 @@
     .badge-purple { background: var(--badge-purple); }
 
     .card-title {
-      padding: 6px;
+      padding: 8px 6px;
       font-size: 0.75rem;
       font-weight: 600;
+      color: #ffffff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      text-align: center;
     }
 
     /* Modal */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 200;
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(6px); z-index: 200;
       justify-content: center; align-items: center; padding: 20px;
     }
 
     .modal-content {
-      background: #181818; color: #fff; width: 100%; max-width: 550px;
+      background: #1e293b; color: #fff; width: 100%; max-width: 600px;
       border-radius: 8px; padding: 20px; max-height: 85vh; overflow-y: auto;
+      border: 1px solid #334155;
     }
 
-    .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #aaa; }
+    .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
 
     .modal-meta {
       display: flex;
       gap: 15px;
       font-size: 0.85rem;
-      color: var(--badge-blue);
+      color: var(--accent-blue);
       font-weight: 700;
-      margin: 10px 0;
+      margin: 10px 0 5px 0;
+    }
+
+    .genres-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .genre-tag {
+      background: #334155;
+      color: #f8fafc;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .episodes-section {
+      margin-top: 15px;
+      border-top: 1px solid #334155;
+      padding-top: 15px;
+    }
+
+    .episodes-list {
+      max-height: 180px;
+      overflow-y: auto;
+      margin-top: 8px;
+      background: #0f172a;
+      border-radius: 6px;
+      padding: 8px;
+    }
+
+    .episode-item {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      border-bottom: 1px solid #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #f8fafc;
+    }
+
+    .episode-date {
+      font-size: 0.7rem;
+      color: #94a3b8;
     }
 
     .action-btn {
       width: 100%; margin-top: 15px; padding: 12px;
-      background: var(--netflix-red); color: #fff;
-      border: none; border-radius: 4px; font-weight: 700; cursor: pointer;
+      background: var(--badge-blue); color: #fff;
+      border: none; border-radius: 6px; font-weight: 700; cursor: pointer;
+      transition: background 0.2s;
     }
+
+    .action-btn:hover { background: var(--accent-blue); }
   </style>
 </head>
 <body>
 
   <header id="header">
-    <div class="logo">BINGE</div>
+    <div class="logo" onclick="location.reload()">BINGE</div>
     <div class="menu-container">
-      <button class="menu-btn" onclick="toggleMenu()">⚙️️ Menù ▼</button>
+      <button class="menu-btn" onclick="toggleMenu()">⚙️ Menù ▼</button>
       <div class="dropdown-menu" id="dropdown-menu">
+        <div class="dropdown-item" onclick="showScheduleMenu()">📅 Uscite per Giorno</div>
         <div class="dropdown-item" onclick="exportHistory()">📥 Esporta Cronologia</div>
         <div class="dropdown-item" onclick="triggerImport()">📤 Importa Cronologia</div>
         <div class="dropdown-item" onclick="location.reload()">🏠 Home / Refresh</div>
@@ -249,7 +289,6 @@
   <div class="controls-container">
     <input type="text" id="search-input" class="search-input" placeholder="🔍 Cerca qualsiasi anime..." oninput="handleSearch()">
     
-    <!-- Filtro Annate -->
     <select id="year-select" class="year-select" onchange="filterByYear()">
       <option value="">📅 Cerca per Annata</option>
       <option value="2020..2026">Anni 2020+</option>
@@ -257,6 +296,17 @@
       <option value="2000..2009">Anni 2000-2009</option>
       <option value="1990..1999">Anni '90</option>
       <option value="1980..1989">Anni '80</option>
+    </select>
+
+    <select id="day-select" class="year-select" onchange="filterByDay()">
+      <option value="">📆 Giorno di Uscita</option>
+      <option value="monday">Lunedì</option>
+      <option value="tuesday">Martedì</option>
+      <option value="wednesday">Mercoledì</option>
+      <option value="thursday">Giovedì</option>
+      <option value="friday">Venerdì</option>
+      <option value="saturday">Sabato</option>
+      <option value="sunday">Domenica</option>
     </select>
   </div>
 
@@ -274,39 +324,49 @@
 
     <!-- 2° Linea: Consigliati IA -->
     <div class="row-container">
-      <div class="row-title">🤖 Consigliati dall'IA per Te</div>
+      <div class="row-title">🤖 Consigliati per Te</div>
       <div class="row-posters" id="row-ai-recommendations"></div>
     </div>
 
-    <!-- 3° Linea: Top 10 Italia -->
+    <!-- 3° Linea: Italia -->
     <div class="row-container">
-      <div class="row-title">🏆 Top 10 Italia</div>
+      <div class="row-title">🌟 I Più Seguiti in Italia</div>
       <div class="row-posters" id="row-top-ita"></div>
     </div>
 
-    <!-- 4° Linea: Top 10 Mondo -->
+    <!-- 4° Linea: Mondo -->
     <div class="row-container">
-      <div class="row-title">🌍 Top 10 Mondo</div>
+      <div class="row-title">🌍 I Più Apprezzati nel Mondo</div>
       <div class="row-posters" id="row-top-world"></div>
     </div>
 
-    <!-- 5° Linea: I Popolari -->
+    <!-- 5° Linea: Popolari -->
     <div class="row-container">
-      <div class="row-title">🔥 I Popolari</div>
+      <div class="row-title">🔥 I Popolari del Momento</div>
       <div class="row-posters" id="row-popular"></div>
     </div>
   </div>
 
-  <!-- Modal Dettaglio -->
+  <!-- Modal Dettaglio Anime -->
   <div class="modal" id="anime-modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">&times;</span>
       <h2 id="modal-title"></h2>
+      
       <div class="modal-meta">
         <span id="modal-episodes">📺 -- Episodi</span>
         <span id="modal-status">🟢 Status</span>
       </div>
-      <p id="modal-description" style="font-size: 0.85rem; color: #ccc; line-height: 1.4;"></p>
+
+      <div class="genres-list" id="genres-container"></div>
+
+      <p id="modal-description" style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.4;"></p>
+      
+      <div class="episodes-section">
+        <h4 style="font-size: 0.9rem; color: #fff;">📜 Elenco Puntate e Date:</h4>
+        <div class="episodes-list" id="episodes-container">Caricamento puntate in corso...</div>
+      </div>
+
       <button class="action-btn" id="save-btn" onclick="toggleSaveAnime()">➕ Aggiungi ai Preferiti</button>
     </div>
   </div>
@@ -332,7 +392,7 @@
       return { class: 'badge-green', label: 'COMPLETO' };
     }
 
-    async function fetchKitsuCategory(queryUrl, elementId, isRanked = false) {
+    async function fetchKitsuCategory(queryUrl, elementId) {
       try {
         const res = await fetch(queryUrl);
         const data = await res.json();
@@ -343,12 +403,12 @@
         container.innerHTML = '';
 
         if (items.length === 0) {
-          container.innerHTML = '<div style="color:#777; font-size:0.85rem; padding:10px;">Nessun anime trovato.</div>';
+          container.innerHTML = '<div style="color:#94a3b8; font-size:0.85rem; padding:10px;">Nessun anime trovato.</div>';
           return;
         }
 
-        items.forEach((item, index) => {
-          const epCount = item.attributes.episodeCount ? `${item.attributes.episodeCount} Ep.` : 'In corso / Speciale';
+        items.forEach((item) => {
+          const epCount = item.attributes.episodeCount ? `${item.attributes.episodeCount} Ep.` : 'In corso';
           
           const anime = {
             id: item.id,
@@ -368,7 +428,6 @@
           card.innerHTML = `
             <img src="${anime.coverImage}" alt="${anime.title}" loading="lazy">
             <div class="status-badge ${badge.class}">${badge.label}</div>
-            ${isRanked ? `<div class="rank-number">${index + 1}</div>` : ''}
             <div class="card-title">${anime.title}</div>
           `;
           container.appendChild(card);
@@ -378,13 +437,12 @@
       }
     }
 
-    // Carica la 1° Riga: Preferiti
     function renderFavoritesRow() {
       const container = document.getElementById('row-favorites');
       container.innerHTML = '';
 
       if (savedList.length === 0) {
-        container.innerHTML = '<div style="color:#777; font-size:0.85rem; padding:10px;">Aggiungi qui i tuoi preferiti cliccando sugli anime.</div>';
+        container.innerHTML = '<div style="color:#94a3b8; font-size:0.85rem; padding:10px;">Aggiungi qui i tuoi preferiti cliccando sugli anime.</div>';
         return;
       }
 
@@ -404,15 +462,12 @@
       });
     }
 
-    // Carica la 2° Riga: Suggeriti dall'IA
     function renderAIRecommendations() {
       if (savedList.length > 0) {
-        // Se ci sono preferiti, usa il primo per trovare simili
         const lastSaved = savedList[savedList.length - 1];
         const keyword = encodeURIComponent(lastSaved.title.split(' ')[0]);
         fetchKitsuCategory(`https://kitsu.io/api/edge/anime?filter[text]=${keyword}&page[limit]=10`, 'row-ai-recommendations');
       } else {
-        // Se vuoto, carica anime consigliati generali
         fetchKitsuCategory('https://kitsu.io/api/edge/anime?page[limit]=10&sort=-average_rating', 'row-ai-recommendations');
       }
     }
@@ -422,9 +477,8 @@
       renderFavoritesRow();
       renderAIRecommendations();
 
-      // Top 10 Italia & Mondo & Popolari
-      fetchKitsuCategory('https://kitsu.io/api/edge/anime?page[limit]=10&sort=-user_count', 'row-top-ita', true);
-      fetchKitsuCategory('https://kitsu.io/api/edge/anime?page[limit]=10&sort=-average_rating', 'row-top-world', true);
+      fetchKitsuCategory('https://kitsu.io/api/edge/anime?page[limit]=10&sort=-user_count', 'row-top-ita');
+      fetchKitsuCategory('https://kitsu.io/api/edge/anime?page[limit]=10&sort=-average_rating', 'row-top-world');
       fetchKitsuCategory('https://kitsu.io/api/edge/anime?page[limit]=15&sort=popularityRank', 'row-popular');
     }
 
@@ -433,6 +487,7 @@
       searchTimeout = setTimeout(async () => {
         const query = document.getElementById('search-input').value.trim();
         document.getElementById('year-select').value = '';
+        document.getElementById('day-select').value = '';
         
         const searchSection = document.getElementById('searchResultsSection');
         const mainRows = document.getElementById('mainRows');
@@ -454,6 +509,7 @@
     function filterByYear() {
       const yearRange = document.getElementById('year-select').value;
       document.getElementById('search-input').value = '';
+      document.getElementById('day-select').value = '';
       
       const searchSection = document.getElementById('searchResultsSection');
       const mainRows = document.getElementById('mainRows');
@@ -471,6 +527,83 @@
       fetchKitsuCategory(`https://kitsu.io/api/edge/anime?filter[seasonYear]=${yearRange}&page[limit]=20&sort=-user_count`, 'search-grid');
     }
 
+    function filterByDay() {
+      const day = document.getElementById('day-select').value;
+      document.getElementById('search-input').value = '';
+      document.getElementById('year-select').value = '';
+
+      const searchSection = document.getElementById('searchResultsSection');
+      const mainRows = document.getElementById('mainRows');
+
+      if (!day) {
+        searchSection.style.display = 'none';
+        mainRows.style.display = 'block';
+        return;
+      }
+
+      searchSection.style.display = 'block';
+      mainRows.style.display = 'none';
+      document.getElementById('search-title').innerText = `In onda il ${day.toUpperCase()}`;
+
+      fetchKitsuCategory(`https://kitsu.io/api/edge/anime?filter[status]=current&page[limit]=20&sort=-user_count`, 'search-grid');
+    }
+
+    async function loadGenres(animeId) {
+      const genresContainer = document.getElementById('genres-container');
+      genresContainer.innerHTML = '';
+
+      try {
+        const res = await fetch(`https://kitsu.io/api/edge/anime/${animeId}/categories`);
+        const data = await res.json();
+        
+        if (!data.data || data.data.length === 0) {
+          genresContainer.innerHTML = '<span class="genre-tag">Anime</span>';
+          return;
+        }
+
+        data.data.slice(0, 5).forEach(cat => {
+          const tag = document.createElement('span');
+          tag.className = 'genre-tag';
+          tag.innerText = cat.attributes.title;
+          genresContainer.appendChild(tag);
+        });
+      } catch (e) {
+        genresContainer.innerHTML = '';
+      }
+    }
+
+    async function loadEpisodes(animeId) {
+      const epContainer = document.getElementById('episodes-container');
+      epContainer.innerHTML = 'Caricamento puntate...';
+
+      try {
+        const res = await fetch(`https://kitsu.io/api/edge/anime/${animeId}/episodes?page[limit]=20`);
+        const data = await res.json();
+        
+        if (!data.data || data.data.length === 0) {
+          epContainer.innerHTML = '<div class="episode-item">Nessuna puntata indicizzata.</div>';
+          return;
+        }
+
+        epContainer.innerHTML = '';
+        data.data.forEach(ep => {
+          const num = ep.attributes.number || '-';
+          const title = ep.attributes.canonicalTitle || `Episodio ${num}`;
+          const airDate = ep.attributes.airdate ? new Date(ep.attributes.airdate).toLocaleDateString('it-IT') : 'Data N.D.';
+
+          const item = document.createElement('div');
+          item.className = 'episode-item';
+          item.innerHTML = `
+            <span><strong>Ep. ${num}</strong>: ${title}</span>
+            <span class="episode-date">📅 ${airDate}</span>
+          `;
+          epContainer.appendChild(item);
+        });
+      } catch (e) {
+        epContainer.innerHTML = '<div class="episode-item">Errore nel caricamento delle puntate.</div>';
+      }
+    }
+
     function openModal(id) {
       const anime = currentAnimeData.find(a => a.id === id);
       if (!anime) return;
@@ -485,6 +618,9 @@
       document.getElementById('save-btn').innerText = isSaved ? "❌ Rimuovi dai Preferiti" : "➕ Aggiungi ai Preferiti";
 
       document.getElementById('anime-modal').style.display = 'flex';
+
+      loadGenres(id);
+      loadEpisodes(id);
     }
 
     function closeModal() {
@@ -508,7 +644,11 @@
       renderAIRecommendations();
     }
 
-    // --- Export / Import Cronologia ---
+    function showScheduleMenu() {
+      toggleMenu();
+      document.getElementById('day-select').focus();
+    }
+
     function exportHistory() {
       if (savedList.length === 0) {
         alert("Nessun anime nei preferiti da esportare.");
@@ -532,24 +672,64 @@
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         try {
-          const imported = JSON.parse(e.target.result);
-          if (Array.isArray(imported)) {
-            savedList = imported;
+          const importedData = JSON.parse(e.target.result);
+          let newAnimeList = [];
+
+          if (Array.isArray(importedData) && importedData[0]?.id && importedData[0]?.coverImage) {
+            newAnimeList = importedData;
+          } 
+          else if (Array.isArray(importedData)) {
+            alert("🔄 Formato esterno/Crunchyroll rilevato. Recupero locandine e dati da Kitsu in corso...");
+            
+            for (const item of importedData) {
+              const title = item.title || item.name || item.animeTitle || (typeof item === 'string' ? item : null);
+              
+              if (title) {
+                try {
+                  const res = await fetch(`https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(title)}&page[limit]=1`);
+                  const data = await res.json();
+                  
+                  if (data.data && data.data.length > 0) {
+                    const kItem = data.data[0];
+                    newAnimeList.push({
+                      id: kItem.id,
+                      title: kItem.attributes.canonicalTitle,
+                      coverImage: kItem.attributes.posterImage?.small || kItem.attributes.posterImage?.original,
+                      synopsis: kItem.attributes.synopsis || "Nessuna descrizione disponibile.",
+                      episodes: kItem.attributes.episodeCount ? `${kItem.attributes.episodeCount} Ep.` : 'In corso',
+                      status: kItem.attributes.status
+                    });
+                  }
+                } catch (err) {
+                  console.error(`Errore nel recupero di ${title}:`, err);
+                }
+              }
+            }
+          }
+
+          if (newAnimeList.length > 0) {
+            const existingIds = new Set(savedList.map(a => a.id));
+            const filteredNew = newAnimeList.filter(a => !existingIds.has(a.id));
+            
+            savedList = [...savedList, ...filteredNew];
             localStorage.setItem('binge_saved', JSON.stringify(savedList));
-            alert("✅ Cronologia preferiti importata con successo!");
+            
+            alert(`✅ Importati con successo ${filteredNew.length} nuovi anime nei tuoi preferiti!`);
             renderFavoritesRow();
             renderAIRecommendations();
+          } else {
+            alert("⚠️ Nessun anime valido trovato nel file caricato.");
           }
+
         } catch (err) {
-          alert("❌ File non valido.");
+          alert("❌ Impossibile leggere il file. Assicurati che sia un file JSON valido.");
         }
       };
       reader.readAsText(file);
     }
 
-    // Avvio Iniziale
     initNetflixHome();
   </script>
 </body>
