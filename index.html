@@ -55,10 +55,7 @@
       letter-spacing: 1px;
     }
 
-    /* Menù a Tendina Top Right */
-    .menu-container {
-      position: relative;
-    }
+    .menu-container { position: relative; }
 
     .menu-btn {
       background: var(--light-blue);
@@ -69,9 +66,6 @@
       font-size: 0.85rem;
       font-weight: 700;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .dropdown-menu {
@@ -95,13 +89,8 @@
       font-size: 0.85rem;
       color: #f8fafc;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
       border-bottom: 1px solid rgba(255,255,255,0.05);
-      transition: background 0.2s;
     }
-
     .dropdown-item:hover { background: rgba(255,255,255,0.1); }
     .dropdown-item:last-child { border-bottom: none; }
 
@@ -111,14 +100,12 @@
       margin: 0 auto;
     }
 
-    /* Box IA */
     .ai-box {
       background: rgba(192, 132, 252, 0.1);
       border: 1px solid rgba(192, 132, 252, 0.3);
       border-radius: 16px;
       padding: 16px;
       margin-bottom: 20px;
-      backdrop-filter: blur(8px);
     }
 
     .ai-title {
@@ -155,7 +142,6 @@
       cursor: pointer;
     }
 
-    /* Filtri & Ricerca */
     .filter-bar {
       display: flex;
       flex-direction: column;
@@ -196,7 +182,6 @@
       min-width: 130px;
     }
 
-    /* Tabs */
     .view-tabs {
       display: flex;
       gap: 10px;
@@ -224,7 +209,6 @@
       font-weight: 700;
     }
 
-    /* Griglia Stremio */
     .stremio-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -274,7 +258,6 @@
 
     .infinite-loader { text-align: center; padding: 25px; font-size: 0.9rem; color: var(--primary-blue); font-weight: 600; }
 
-    /* Modal Dettaglio */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.75); backdrop-filter: blur(5px); z-index: 200;
@@ -305,15 +288,13 @@
 
   <header>
     <div class="logo">BINGE 🍿</div>
-    
-    <!-- Menù a Tendina -->
     <div class="menu-container">
       <button class="menu-btn" onclick="toggleMenu()">⚙️ Menù ▼</button>
       <div class="dropdown-menu" id="dropdown-menu">
         <div class="dropdown-item" onclick="exportHistory()">📥 Esporta Cronologia</div>
         <div class="dropdown-item" onclick="triggerImport()">📤 Importa Cronologia</div>
-        <div class="dropdown-item" onclick="showHistoryList()">📜 La Mia Lista Saved</div>
-        <div class="dropdown-item" onclick="cycleTheme()">🎨 Cambia Tema</div>
+        <div class="dropdown-item" onclick="showSavedList()">📜 La Mia Lista Saved</div>
+        <div class="dropdown-item" onclick="resetToHome()">🏠 Home / Esplora</div>
       </div>
     </div>
   </header>
@@ -322,17 +303,15 @@
 
   <div class="container">
     
-    <!-- Suggerimenti IA -->
     <div class="ai-box">
       <div class="ai-title">🤖 Suggerimenti Personali IA</div>
-      <div style="font-size:0.8rem; color: #cbd5e1;">Inserisci un anime piaciuto per trovare titoli simili:</div>
+      <div style="font-size:0.8rem; color: #cbd5e1;">Inserisci un anime che ti è piaciuto:</div>
       <div class="ai-input-group">
         <input type="text" id="ai-anime-input" class="ai-input" placeholder="Es. Attack on Titan, Solo Leveling...">
         <button class="ai-btn" onclick="getAIRecommendations()">Trova Simili ✨</button>
       </div>
     </div>
 
-    <!-- Filtri e Ricerca -->
     <div class="filter-bar">
       <input type="text" id="search-input" class="search-input" placeholder="🔍 Cerca qualsiasi anime..." oninput="handleSearch()">
       
@@ -358,7 +337,6 @@
       </div>
     </div>
 
-    <!-- Categorie Tabs -->
     <div class="view-tabs">
       <button class="tab-btn active" onclick="switchTab('ALL', this)">🔥 Tutti</button>
       <button class="tab-btn" onclick="switchTab('READY', this)">🟢 Pronti per il Binge</button>
@@ -367,14 +345,12 @@
       <button class="tab-btn" onclick="switchTab('UPCOMING', this)">📅 Prossimi</button>
     </div>
 
-    <!-- Griglia Unica -->
     <div class="stremio-grid" id="stremio-grid"></div>
 
-    <div class="infinite-loader" id="loader">⏳ Caricamento in corso...</div>
+    <div class="infinite-loader" id="loader">⏳ Caricamento anime in corso...</div>
 
   </div>
 
-  <!-- Modal Dettaglio -->
   <div class="modal" id="anime-modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -394,13 +370,6 @@
     let currentCategory = 'ALL';
     let searchTimeout = null;
     let selectedAnimeId = null;
-    let currentThemeIndex = 0;
-
-    const themes = [
-      'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #31103f 100%)',
-      'linear-gradient(135deg, #2d1b4e 0%, #7c2d12 50%, #9f1239 100%)',
-      'linear-gradient(135deg, #111827 0%, #1f2937 100%)'
-    ];
 
     function toggleMenu() {
       document.getElementById('dropdown-menu').classList.toggle('show');
@@ -415,28 +384,29 @@
       }
     }
 
-    function cycleTheme() {
-      currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-      document.documentElement.style.setProperty('--bg-gradient', themes[currentThemeIndex]);
-    }
-
     function getAnimeBadge(anime) {
       if (!anime) return { class: 'badge-blue', label: 'ANIME', code: 'ALL' };
-      const hasSequel = anime.relations && anime.relations.edges && anime.relations.edges.some(edge => edge.relationType === 'SEQUEL');
+      
+      const status = anime.status;
+      const relations = anime.relations && anime.relations.edges ? anime.relations.edges : [];
+      const hasSequel = relations.some(edge => edge.relationType === 'SEQUEL');
 
-      if (anime.status === 'NOT_YET_RELEASED') {
+      if (status === 'NOT_YET_RELEASED') {
         return { class: 'badge-purple', label: 'PROSSIMAMENTE', code: 'UPCOMING' };
       }
-      if (anime.status === 'RELEASING') {
+      if (status === 'RELEASING') {
         return { class: 'badge-blue', label: 'IN CORSO', code: 'AIRING' };
       }
-      if (anime.status === 'FINISHED') {
+      if (status === 'FINISHED') {
         if (hasSequel) {
           return { class: 'badge-yellow', label: 'SEQUEL CONF.', code: 'READY' };
         }
         return { class: 'badge-green', label: 'STAGIONE FINITA', code: 'READY' };
       }
-      return { class: 'badge-red', label: 'CONCLUSA', code: 'ENDED' };
+      if (status === 'CANCELLED' || status === 'HIATUS') {
+        return { class: 'badge-red', label: 'SOSPESO', code: 'ENDED' };
+      }
+      return { class: 'badge-red', label: 'FINITO', code: 'ENDED' };
     }
 
     function fetchAnime(page = 1, searchQuery = "", genre = "", format = "", append = false) {
@@ -445,20 +415,13 @@
       isLoading = true;
       document.getElementById('loader').style.display = 'block';
 
-      let filterArgs = `page: ${page}, perPage: 40, sort: POPULARITY_DESC`;
-      
-      if (searchQuery) {
-        filterArgs = `page: ${page}, perPage: 40, search: "${searchQuery}"`;
-      } else {
-        if (genre) filterArgs += `, genre: "${genre}"`;
-        if (format) filterArgs += `, format: ${format}`;
-      }
-
       const query = `
-      query {
-        Page(${filterArgs}) {
-          pageInfo { hasNextPage }
-          media(type: ANIME) {
+      query ($page: Int, $perPage: Int, $search: String, $genre: String, $format: MediaFormat) {
+        Page (page: $page, perPage: $perPage) {
+          pageInfo {
+            hasNextPage
+          }
+          media (type: ANIME, search: $search, genre: $genre, format: $format, sort: [POPULARITY_DESC]) {
             id
             title { english romaji }
             coverImage { extraLarge }
@@ -472,13 +435,22 @@
         }
       }`;
 
+      const variables = {
+        page: page,
+        perPage: 40
+      };
+
+      if (searchQuery) variables.search = searchQuery;
+      if (genre) variables.genre = genre;
+      if (format) variables.format = format;
+
       fetch('https://graphql.anilist.co', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ query: query })
+        body: JSON.stringify({ query: query, variables: variables })
       })
       .then(res => res.json())
       .then(data => {
@@ -497,7 +469,7 @@
       .catch(err => {
         console.error("Errore AniList:", err);
         isLoading = false;
-        document.getElementById('loader').innerText = "❌ Errore di connessione.";
+        document.getElementById('loader').innerText = "❌ Errore durante il recupero dei dati.";
       });
     }
 
@@ -509,8 +481,8 @@
       document.getElementById('loader').style.display = 'block';
 
       const query = `
-      query {
-        Media(search: "${input}", type: ANIME) {
+      query ($search: String) {
+        Media (search: $search, type: ANIME) {
           recommendations(perPage: 30) {
             nodes {
               mediaRecommendation {
@@ -535,7 +507,7 @@
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ query: query })
+        body: JSON.stringify({ query: query, variables: { search: input } })
       })
       .then(res => res.json())
       .then(data => {
@@ -568,7 +540,7 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 20px;">Nessun anime trovato.</div>';
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 20px;">Nessun anime trovato per questo filtro.</div>';
         return;
       }
 
@@ -605,14 +577,16 @@
       searchTimeout = setTimeout(() => {
         currentPage = 1;
         hasNextPage = true;
+        fetchedAnimeData = [];
         const query = document.getElementById('search-input').value.trim();
         fetchAnime(1, query, document.getElementById('genre-select').value, document.getElementById('format-select').value, false);
-      }, 500);
+      }, 400);
     }
 
     function applyFilters() {
       currentPage = 1;
       hasNextPage = true;
+      fetchedAnimeData = [];
       const searchVal = document.getElementById('search-input').value.trim();
       const genreVal = document.getElementById('genre-select').value;
       const formatVal = document.getElementById('format-select').value;
@@ -665,7 +639,6 @@
       localStorage.setItem('binge_saved', JSON.stringify(savedList));
     }
 
-    /* Import & Export Cronologia */
     function exportHistory() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedList));
       const downloadAnchor = document.createElement('a');
@@ -700,9 +673,20 @@
       reader.readAsText(file);
     }
 
-    function showHistoryList() {
+    function showSavedList() {
       fetchedAnimeData = savedList;
       renderGrid();
+      toggleMenu();
+    }
+
+    function resetToHome() {
+      currentPage = 1;
+      hasNextPage = true;
+      fetchedAnimeData = [];
+      document.getElementById('search-input').value = '';
+      document.getElementById('genre-select').value = '';
+      document.getElementById('format-select').value = '';
+      fetchAnime(1);
       toggleMenu();
     }
 
