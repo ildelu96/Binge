@@ -41,8 +41,6 @@
       padding: 12px 20px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
       align-items: center;
       justify-content: space-between;
       position: sticky;
@@ -63,7 +61,6 @@
       margin: 0 auto;
     }
 
-    /* Sezione Consigli IA */
     .ai-box {
       background: rgba(192, 132, 252, 0.1);
       border: 1px solid rgba(192, 132, 252, 0.3);
@@ -108,12 +105,8 @@
       border-radius: 10px;
       font-weight: 700;
       cursor: pointer;
-      transition: opacity 0.2s;
     }
 
-    .ai-btn:hover { opacity: 0.9; }
-
-    /* Filtri & Ricerca */
     .filter-bar {
       display: flex;
       flex-direction: column;
@@ -181,11 +174,10 @@
       font-weight: 700;
     }
 
-    /* Griglia Stremio */
     .stremio-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 14px;
     }
 
     @media (min-width: 768px) {
@@ -198,12 +190,9 @@
       overflow: hidden;
       cursor: pointer;
       border: 1px solid rgba(255,255,255,0.05);
-      transition: transform 0.2s ease;
       display: flex;
       flex-direction: column;
     }
-
-    .anime-card:hover { transform: translateY(-5px); }
 
     .poster-container { position: relative; width: 100%; aspect-ratio: 2 / 3; }
     .poster-img { width: 100%; height: 100%; object-fit: cover; }
@@ -211,20 +200,26 @@
     .status-badge {
       position: absolute;
       top: 6px; right: 6px;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 0.58rem;
+      padding: 4px 6px;
+      border-radius: 10px;
+      font-size: 0.55rem;
       font-weight: 800;
       color: #fff;
       text-transform: uppercase;
     }
 
-    .card-info { padding: 10px; display: flex; flex-direction: column; gap: 4px; }
-    .anime-title { font-size: 0.85rem; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .badge-blue { background: var(--badge-blue); }
+    .badge-orange { background: var(--badge-orange); }
+    .badge-green { background: var(--badge-green); }
+    .badge-yellow { background: var(--badge-yellow); }
+    .badge-red { background: var(--badge-red); }
+    .badge-purple { background: var(--badge-purple); }
 
-    .infinite-loader { text-align: center; padding: 30px; font-size: 0.9rem; color: var(--primary-blue); display: none; font-weight: 600; }
+    .card-info { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+    .anime-title { font-size: 0.8rem; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-    /* Modal */
+    .infinite-loader { text-align: center; padding: 20px; font-size: 0.9rem; color: var(--primary-blue); font-weight: 600; }
+
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 200;
@@ -247,17 +242,15 @@
 
   <div class="container">
     
-    <!-- Box Raccomandazioni Personali IA -->
     <div class="ai-box">
       <div class="ai-title">🤖 Suggerimenti Personali basati su IA</div>
-      <div style="font-size:0.8rem; color: #cbd5e1;">Scrivi un anime che ti è piaciuto molto per scoprire titoli simili con la stessa atmosfera:</div>
+      <div style="font-size:0.8rem; color: #cbd5e1;">Scrivi un anime che ti è piaciuto molto per scoprire titoli simili:</div>
       <div class="ai-input-group">
-        <input type="text" id="ai-anime-input" class="ai-input" placeholder="Es. Attack on Titan, Solo Leveling, Toradora...">
+        <input type="text" id="ai-anime-input" class="ai-input" placeholder="Es. Attack on Titan, Solo Leveling...">
         <button class="ai-btn" onclick="getAIRecommendations()">Trova Simili ✨</button>
       </div>
     </div>
 
-    <!-- Filtri e Ricerca Globale -->
     <div class="filter-bar">
       <input type="text" id="search-input" class="search-input" placeholder="🔍 Cerca qualsiasi anime nel database..." oninput="handleSearch()">
       
@@ -270,6 +263,7 @@
           <option value="Drama">Drammatico</option>
           <option value="Fantasy">Fantasy</option>
           <option value="Romance">Romantico</option>
+
           <option value="Sci-Fi">Sci-Fi</option>
           <option value="Slice of Life">Slice of Life</option>
         </select>
@@ -283,7 +277,6 @@
       </div>
     </div>
 
-    <!-- Categorie Stremio -->
     <div class="view-tabs">
       <button class="tab-btn active" onclick="switchTab('ALL', this)">🔥 Tutti</button>
       <button class="tab-btn" onclick="switchTab('READY', this)">🟢 Pronti per il Binge</button>
@@ -292,14 +285,12 @@
       <button class="tab-btn" onclick="switchTab('UPCOMING', this)">📅 Prossimi</button>
     </div>
 
-    <!-- Griglia Unica -->
     <div class="stremio-grid" id="stremio-grid"></div>
 
-    <div class="infinite-loader" id="loader">⏳ Caricamento altri anime in corso...</div>
+    <div class="infinite-loader" id="loader">⏳ Caricamento anime...</div>
 
   </div>
 
-  <!-- Modal -->
   <div class="modal" id="anime-modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -318,7 +309,8 @@
     let searchTimeout = null;
 
     function getAnimeBadge(anime) {
-      const hasSequel = anime.relations && anime.relations.edges.some(edge => edge.relationType === 'SEQUEL');
+      if (!anime) return { class: 'badge-blue', label: 'ANIME', code: 'ALL' };
+      const hasSequel = anime.relations && anime.relations.edges && anime.relations.edges.some(edge => edge.relationType === 'SEQUEL');
 
       if (anime.status === 'NOT_YET_RELEASED') {
         return { class: 'badge-purple', label: 'PROSSIMAMENTE', code: 'UPCOMING' };
@@ -370,28 +362,33 @@
 
       fetch('https://graphql.anilist.co', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({ query: query })
       })
       .then(res => res.json())
       .then(data => {
-        const pageInfo = data.data.Page.pageInfo;
-        const newAnime = data.data.Page.media;
+        if (data && data.data && data.data.Page) {
+          const pageInfo = data.data.Page.pageInfo;
+          const newAnime = data.data.Page.media || [];
 
-        hasNextPage = pageInfo.hasNextPage;
-        fetchedAnimeData = append ? [...fetchedAnimeData, ...newAnime] : newAnime;
+          hasNextPage = pageInfo.hasNextPage;
+          fetchedAnimeData = append ? [...fetchedAnimeData, ...newAnime] : newAnime;
 
-        renderGrid();
+          renderGrid();
+        }
         isLoading = false;
         document.getElementById('loader').style.display = 'none';
       })
-      .catch(() => {
+      .catch(err => {
+        console.error("Errore AniList:", err);
         isLoading = false;
-        document.getElementById('loader').style.display = 'none';
+        document.getElementById('loader').innerText = "❌ Errore di caricamento. Riprova più tardi.";
       });
     }
 
-    /* Motore di Raccomandazione Smart */
     function getAIRecommendations() {
       const input = document.getElementById('ai-anime-input').value.trim();
       if (!input) return;
@@ -399,7 +396,6 @@
       isLoading = true;
       document.getElementById('loader').style.display = 'block';
 
-      // Cerca prima l'ID dell'anime inserito, poi ottieni i consigli correlati
       const query = `
       query {
         Media(search: "${input}", type: ANIME) {
@@ -424,14 +420,17 @@
 
       fetch('https://graphql.anilist.co', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({ query: query })
       })
       .then(res => res.json())
       .then(data => {
-        if (data.data.Media && data.data.Media.recommendations.nodes) {
+        if (data && data.data && data.data.Media && data.data.Media.recommendations) {
           const recs = data.data.Media.recommendations.nodes
-            .filter(node => node.mediaRecommendation !== null)
+            .filter(node => node && node.mediaRecommendation)
             .map(node => node.mediaRecommendation);
           
           fetchedAnimeData = recs;
@@ -440,7 +439,8 @@
         isLoading = false;
         document.getElementById('loader').style.display = 'none';
       })
-      .catch(() => {
+      .catch(err => {
+        console.error(err);
         isLoading = false;
         document.getElementById('loader').style.display = 'none';
       });
@@ -451,21 +451,28 @@
       grid.innerHTML = '';
 
       const filtered = fetchedAnimeData.filter(anime => {
+        if (!anime) return false;
         if (currentCategory === 'ALL') return true;
         const badge = getAnimeBadge(anime);
         return badge.code === currentCategory;
       });
 
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 20px;">Nessun anime trovato in questa categoria.</div>';
+        return;
+      }
+
       filtered.forEach(anime => {
         const badge = getAnimeBadge(anime);
-        const title = anime.title.english || anime.title.romaji;
+        const title = (anime.title && (anime.title.english || anime.title.romaji)) || 'Titolo Sconosciuto';
+        const cover = (anime.coverImage && anime.coverImage.extraLarge) || '';
 
         const card = document.createElement('div');
         card.className = 'anime-card';
         card.onclick = () => openModal(anime.id);
         card.innerHTML = `
           <div class="poster-container">
-            <img class="poster-img" src="${anime.coverImage.extraLarge}" alt="${title}" loading="lazy">
+            <img class="poster-img" src="${cover}" alt="${title}" loading="lazy">
             <div class="status-badge ${badge.class}">${badge.label}</div>
           </div>
           <div class="card-info">
@@ -515,11 +522,11 @@
     });
 
     function openModal(id) {
-      const anime = fetchedAnimeData.find(a => a.id === id);
+      const anime = fetchedAnimeData.find(a => a && a.id === id);
       if(!anime) return;
 
-      document.getElementById('modal-title').innerText = anime.title.english || anime.title.romaji;
-      document.getElementById('modal-genres').innerText = "Generi: " + anime.genres.join(", ");
+      document.getElementById('modal-title').innerText = (anime.title && (anime.title.english || anime.title.romaji)) || '';
+      document.getElementById('modal-genres').innerText = anime.genres ? "Generi: " + anime.genres.join(", ") : "";
       document.getElementById('modal-description').innerHTML = anime.description || "Descrizione non disponibile.";
       document.getElementById('anime-modal').style.display = 'flex';
     }
@@ -528,6 +535,7 @@
       document.getElementById('anime-modal').style.display = 'none';
     }
 
+    // Caricamento iniziale
     fetchAnime(1);
   </script>
 </body>
