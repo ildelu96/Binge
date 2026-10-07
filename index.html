@@ -14,6 +14,7 @@
       --badge-blue: #0284c7;    
       --badge-green: #10b981;   
       --badge-purple: #a855f7;
+      --badge-red: #ef4444;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,7 +29,7 @@
 
     /* HEADER */
     header {
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0) 100%);
+      background: rgba(15, 23, 42, 0.95);
       padding: 15px 4%;
       display: flex;
       align-items: center;
@@ -36,24 +37,57 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      transition: background 0.3s;
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
-    header.scrolled { background: var(--bg-main); border-bottom: 1px solid #1e293b; }
 
     .logo {
       font-size: 1.6rem; font-weight: 900; color: var(--accent-blue);
       letter-spacing: 1.5px; cursor: pointer;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .notif-btn {
+      position: relative;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: -6px; right: -6px;
+      background: var(--badge-red);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 10px;
+      display: none;
+    }
+
     .menu-container { position: relative; }
     .menu-btn {
       background: rgba(30, 41, 59, 0.8); color: #fff;
       border: 1px solid rgba(56, 189, 248, 0.4);
-      padding: 6px 14px; border-radius: 6px; font-size: 0.85rem;
+      padding: 8px 16px; border-radius: 6px; font-size: 0.85rem;
       font-weight: 600; cursor: pointer;
     }
+
     .dropdown-menu {
-      display: none; position: absolute; right: 0; top: 40px;
+      display: none; position: absolute; right: 0; top: 45px;
       background: #1e293b; border: 1px solid #334155; border-radius: 6px;
       width: 220px; z-index: 110; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
     }
@@ -66,7 +100,7 @@
 
     /* CONTROLS BAR */
     .controls-container {
-      margin-top: 80px; padding: 0 4%; display: flex; gap: 10px; flex-wrap: wrap;
+      margin-top: 85px; padding: 0 4%; display: flex; gap: 10px; flex-wrap: wrap;
     }
     .search-input, .year-select {
       padding: 10px 15px; background: #1e293b; border: 1px solid #334155;
@@ -112,7 +146,27 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
     }
 
-    /* AUTH MODAL (Mantenuto modale per comodità d'accesso) */
+    /* PANNELLO NOTIFICHE */
+    .notif-drawer {
+      display: none; position: fixed; top: 65px; right: 4%; width: 340px; max-width: 90vw;
+      background: #1e293b; border: 1px solid #334155; border-radius: 8px;
+      z-index: 150; box-shadow: 0 10px 25px rgba(0,0,0,0.5); padding: 15px;
+      max-height: 450px; overflow-y: auto;
+    }
+    .notif-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px; border-bottom: 1px solid #334155; padding-bottom: 8px;
+    }
+    .notif-item {
+      background: #0f172a; padding: 10px; border-radius: 6px; margin-bottom: 8px;
+      border-left: 4px solid var(--accent-blue); font-size: 0.82rem; cursor: pointer;
+    }
+    .notif-item.unread { border-left-color: var(--badge-red); background: #1a233a; }
+    .notif-item-title { font-weight: bold; margin-bottom: 4px; color: #fff; }
+    .notif-item-desc { color: #cbd5e1; margin-bottom: 4px; }
+    .notif-item-date { font-size: 0.7rem; color: #94a3b8; }
+
+    /* AUTH MODAL */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(6px); z-index: 200;
@@ -136,8 +190,8 @@
     .btn-secondary { background: #334155; }
     .btn-secondary:hover { background: #475569; }
 
-    /* LAYOUT PAGINA DETTAGLI (NUOVA PAGINA) */
-    #view-details { display: none; padding: 80px 4% 40px 4%; }
+    /* LAYOUT PAGINA DETTAGLI */
+    #view-details { display: none; padding: 85px 4% 40px 4%; }
     .back-btn {
       background: transparent; color: var(--accent-blue); border: 1px solid var(--accent-blue);
       padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;
@@ -148,7 +202,7 @@
     .details-grid { display: flex; flex-direction: column; gap: 25px; }
     @media(min-width: 768px) {
       .details-grid { flex-direction: row; align-items: flex-start; }
-      .details-poster-area { width: 300px; flex-shrink: 0; position: sticky; top: 90px; }
+      .details-poster-area { width: 280px; flex-shrink: 0; position: sticky; top: 90px; }
     }
     
     .details-poster-area img { width: 100%; border-radius: 8px; border: 1px solid #334155; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
@@ -173,17 +227,34 @@
   <!-- HEADER GLOBALE -->
   <header id="header">
     <div class="logo" onclick="goHome()">BINGE</div>
-    <div class="menu-container">
-      <button class="menu-btn" onclick="toggleMenu()" id="main-menu-btn">👤 Accedi ▼</button>
-      <div class="dropdown-menu" id="dropdown-menu">
-        <div id="auth-menu-items"></div>
-        <div style="border-top: 1px solid #334155; margin-top: 5px; padding-top: 5px;">
-          <div class="dropdown-item" onclick="showScheduleMenu()">📅 Uscite per Giorno</div>
-          <div class="dropdown-item" onclick="goHome()">🏠 Home / Refresh</div>
+    <div class="header-actions">
+      <!-- TASTO NOTIFICHE -->
+      <button class="notif-btn" onclick="toggleNotifications()" title="Notifiche">
+        🔔 <span class="notif-badge" id="notif-count">0</span>
+      </button>
+
+      <div class="menu-container">
+        <button class="menu-btn" onclick="toggleMenu()" id="main-menu-btn">👤 Accedi ▼</button>
+        <div class="dropdown-menu" id="dropdown-menu">
+          <div id="auth-menu-items"></div>
+          <div style="border-top: 1px solid #334155; margin-top: 5px; padding-top: 5px;">
+            <div class="dropdown-item" onclick="goHome()">🏠 Home / Refresh</div>
+          </div>
         </div>
       </div>
     </div>
   </header>
+
+  <!-- DRAWER NOTIFICHE -->
+  <div class="notif-drawer" id="notif-drawer">
+    <div class="notif-header">
+      <h3 style="font-size:1rem; color:#fff;">🔔 Notifiche Preferiti</h3>
+      <span style="font-size:0.75rem; color:var(--accent-blue); cursor:pointer;" onclick="clearAllNotifications()">Svuota</span>
+    </div>
+    <div id="notif-list-container">
+      <div style="color:#94a3b8; font-size:0.85rem; text-align:center; padding:15px;">Nessuna nuova notifica.</div>
+    </div>
+  </div>
 
   <input type="file" id="import-file" style="display:none" onchange="importHistory(event)">
 
@@ -198,20 +269,9 @@
         <option value="2010..2019">Anni 2010-2019</option>
         <option value="2000..2009">Anni 2000-2009</option>
       </select>
-
-      <select id="day-select" class="year-select" onchange="filterByDay()">
-        <option value="">📆 Giorno di Uscita (Oggi)</option>
-        <option value="monday">Lunedì</option>
-        <option value="tuesday">Martedì</option>
-        <option value="wednesday">Mercoledì</option>
-        <option value="thursday">Giovedì</option>
-        <option value="friday">Venerdì</option>
-        <option value="saturday">Sabato</option>
-        <option value="sunday">Domenica</option>
-      </select>
     </div>
 
-    <!-- Risultati Ricerca / Giorno -->
+    <!-- Risultati Ricerca -->
     <div id="searchResultsSection" class="row-container" style="display:none;">
       <div class="row-title" id="search-title">Risultati</div>
       <div class="row-posters" id="search-grid" style="flex-wrap: wrap; overflow-x: visible;"></div>
@@ -224,7 +284,7 @@
         <div class="row-posters" id="row-favorites"></div>
       </div>
 
-      <!-- Nuove Uscite (NOVITÀ) -->
+      <!-- Nuove Uscite -->
       <div class="row-container">
         <div class="row-title">🌟 Nuove Uscite</div>
         <div class="row-posters" id="row-new-releases"></div>
@@ -244,7 +304,7 @@
     </div>
   </div>
 
-  <!-- ==================== VISTA DETTAGLI (NUOVA PAGINA) ==================== -->
+  <!-- ==================== VISTA DETTAGLI (PAGINA INTERA) ==================== -->
   <div id="view-details">
     <button class="back-btn" onclick="goHome()">⬅ Torna Indietro</button>
     
@@ -253,6 +313,7 @@
       <div class="details-poster-area">
         <img id="detail-poster" src="" alt="Locandina">
         <button class="action-btn" id="save-btn" onclick="toggleSaveAnime()">➕ Aggiungi ai Preferiti</button>
+        <button class="action-btn btn-secondary" style="font-size:0.75rem;" onclick="simulateNotification()">🔔 Testa Notifica Simulata</button>
       </div>
 
       <!-- Colonna Destra: Info e Puntate -->
@@ -293,6 +354,7 @@
     let currentUser = localStorage.getItem('binge_current_user') || null;
     let usersDb = JSON.parse(localStorage.getItem('binge_users_db') || '{}');
     let savedList = []; 
+    let userNotifications = [];
     let currentAnimeData = [];
     let selectedAnimeId = null;
     let searchTimeout = null;
@@ -301,25 +363,25 @@
     function goHome() {
       document.getElementById('view-details').style.display = 'none';
       document.getElementById('view-home').style.display = 'block';
+      document.getElementById('notif-drawer').style.display = 'none';
       window.scrollTo(0,0);
     }
     
     function showDetailsPage() {
       document.getElementById('view-home').style.display = 'none';
       document.getElementById('view-details').style.display = 'block';
+      document.getElementById('notif-drawer').style.display = 'none';
       window.scrollTo(0,0);
     }
 
-    window.onscroll = () => {
-      document.getElementById('header').classList.toggle('scrolled', window.scrollY > 20);
-    };
-
     function toggleMenu() { document.getElementById('dropdown-menu').classList.toggle('show'); }
 
-    // --- AUTENTICAZIONE ---
+    // --- SISTEMA AUTENTICAZIONE & SESSIONE ---
     function initUserSession() {
       if (currentUser) {
         savedList = JSON.parse(localStorage.getItem(`binge_saved_${currentUser}`) || '[]');
+        userNotifications = JSON.parse(localStorage.getItem(`binge_notifs_${currentUser}`) || '[]');
+        
         document.getElementById('main-menu-btn').innerText = `👤 ${currentUser} ▼`;
         document.getElementById('favorites-title').innerText = `❤️ Preferiti di ${currentUser}`;
         document.getElementById('auth-menu-items').innerHTML = `
@@ -327,12 +389,15 @@
           <div class="dropdown-item" onclick="triggerImport()">📤 Importa Preferiti</div>
           <div class="dropdown-item" style="color: #ef4444;" onclick="logout()">🚪 Esci (Logout)</div>
         `;
+        checkFavoritesUpdates();
       } else {
         savedList = [];
+        userNotifications = [];
         document.getElementById('main-menu-btn').innerText = `🔒 Accedi ▼`;
         document.getElementById('favorites-title').innerText = `❤️ I Tuoi Preferiti (Accedi per salvare)`;
         document.getElementById('auth-menu-items').innerHTML = `<div class="dropdown-item" onclick="openAuthModal()">🔑 Accedi / Registrati</div>`;
       }
+      renderNotifications();
       initNetflixHome();
     }
 
@@ -374,7 +439,112 @@
       errEl.innerText = msg; errEl.style.display = 'block';
     }
 
-    // --- CARICAMENTO DATI ---
+    // --- SISTEMA NOTIFICHE ---
+    function toggleNotifications() {
+      const drawer = document.getElementById('notif-drawer');
+      drawer.style.display = drawer.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function addNotification(animeTitle, message, type = 'info', animeId = null) {
+      if (!currentUser) return;
+      const notif = {
+        id: Date.now(),
+        animeTitle,
+        message,
+        type,
+        animeId,
+        date: new Date().toLocaleDateString('it-IT') + ' ' + new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'}),
+        unread: true
+      };
+      userNotifications.unshift(notif);
+      localStorage.setItem(`binge_notifs_${currentUser}`, JSON.stringify(userNotifications));
+      renderNotifications();
+    }
+
+    function renderNotifications() {
+      const countBadge = document.getElementById('notif-count');
+      const container = document.getElementById('notif-list-container');
+      
+      const unreadCount = userNotifications.filter(n => n.unread).length;
+      if (unreadCount > 0) {
+        countBadge.innerText = unreadCount;
+        countBadge.style.display = 'block';
+      } else {
+        countBadge.style.display = 'none';
+      }
+
+      if (userNotifications.length === 0) {
+        container.innerHTML = '<div style="color:#94a3b8; font-size:0.85rem; text-align:center; padding:15px;">Nessuna notifica presente.</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      userNotifications.forEach(n => {
+        const item = document.createElement('div');
+        item.className = `notif-item ${n.unread ? 'unread' : ''}`;
+        item.onclick = () => {
+          n.unread = false;
+          localStorage.setItem(`binge_notifs_${currentUser}`, JSON.stringify(userNotifications));
+          renderNotifications();
+          if (n.animeId) openDetails(n.animeId);
+        };
+        item.innerHTML = `
+          <div class="notif-item-title">${n.animeTitle}</div>
+          <div class="notif-item-desc">${n.message}</div>
+          <div class="notif-item-date">${n.date}</div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function clearAllNotifications() {
+      if (!currentUser) return;
+      userNotifications = [];
+      localStorage.setItem(`binge_notifs_${currentUser}`, JSON.stringify(userNotifications));
+      renderNotifications();
+    }
+
+    // Monitora lo stato dei preferiti per creare notifiche automatiche
+    async function checkFavoritesUpdates() {
+      if (!currentUser || savedList.length === 0) return;
+
+      for (let anime of savedList) {
+        try {
+          const res = await fetch(`https://kitsu.io/api/edge/anime/${anime.id}`);
+          const data = await res.json();
+          if (!data.data) continue;
+          
+          const newStatus = data.data.attributes.status;
+          const oldStatus = anime.status;
+
+          if (oldStatus !== newStatus) {
+            anime.status = newStatus;
+            let msg = "";
+            if (newStatus === 'current') msg = "🚀 Nuova Stagione in onda!";
+            else if (newStatus === 'finished') msg = "🏁 La Stagione si è conclusa!";
+            else if (newStatus === 'upcoming') msg = "📢 Nuova Stagione confermata / In arrivo!";
+            
+            if (msg) addNotification(anime.title, msg, 'status_change', anime.id);
+          }
+        } catch(e) {}
+      }
+      localStorage.setItem(`binge_saved_${currentUser}`, JSON.stringify(savedList));
+    }
+
+    function simulateNotification() {
+      const anime = currentAnimeData.find(a => a.id === selectedAnimeId);
+      if (!anime) return;
+      const types = [
+        "🚀 È iniziata la Nuova Stagione!",
+        "🏁 Si è appena conclusa l'ultima stagione!",
+        "📢 Ufficialmente confermata una Nuova Stagione!"
+      ];
+      const randomMsg = types[Math.floor(Math.random() * types.length)];
+      addNotification(anime.title, randomMsg, 'simulated', anime.id);
+      alert("🔔 Notifica inviata! Controlla la campanella in alto.");
+    }
+
+    // --- CARICAMENTO ANIME & HOME ---
     function getAnimeBadge(status) {
       const st = (status || '').toLowerCase();
       if (st.includes('current') || st.includes('airing')) return { class: 'badge-blue', label: 'IN CORSO' };
@@ -404,8 +574,7 @@
             coverImage: item.attributes.posterImage?.small || item.attributes.posterImage?.original,
             synopsis: item.attributes.synopsis || "Nessuna descrizione disponibile.",
             episodes: epCount,
-            status: item.attributes.status,
-            source: 'kitsu'
+            status: item.attributes.status
           };
 
           if(!currentAnimeData.find(a => a.id === anime.id)) currentAnimeData.push(anime);
@@ -432,7 +601,7 @@
         return;
       }
       if (savedList.length === 0) {
-        container.innerHTML = '<div style="color:#94a3b8; font-size:0.85rem; padding:10px;">Ancora nessun anime salvato.</div>';
+        container.innerHTML = '<div style="color:#94a3b8; font-size:0.85rem; padding:10px;">Ancora nessun anime salvato nei preferiti.</div>';
         return;
       }
       savedList.forEach(anime => {
@@ -471,7 +640,7 @@
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
         const query = document.getElementById('search-input').value.trim();
-        document.getElementById('year-select').value = ''; document.getElementById('day-select').value = '';
+        document.getElementById('year-select').value = '';
         const searchSection = document.getElementById('searchResultsSection');
         const mainRows = document.getElementById('mainRows');
         if (!query) { searchSection.style.display = 'none'; mainRows.style.display = 'block'; return; }
@@ -490,62 +659,7 @@
       fetchKitsuCategory(`https://kitsu.io/api/edge/anime?filter[seasonYear]=${year}&page[limit]=20&sort=-user_count`, 'search-grid');
     }
 
-    // --- USCITE DEL GIORNO (Risolto con API Jikan) ---
-    async function filterByDay() {
-      const day = document.getElementById('day-select').value;
-      document.getElementById('search-input').value = ''; document.getElementById('year-select').value = '';
-      const searchSection = document.getElementById('searchResultsSection');
-      const mainRows = document.getElementById('mainRows');
-      
-      if (!day) { searchSection.style.display = 'none'; mainRows.style.display = 'block'; return; }
-      
-      searchSection.style.display = 'block'; mainRows.style.display = 'none';
-      document.getElementById('search-title').innerText = `In onda il ${day.toUpperCase()}`;
-      
-      const container = document.getElementById('search-grid');
-      container.innerHTML = '<div style="color:#fff; padding: 20px;">Caricamento palinsesto...</div>';
-
-      try {
-        // Uso Jikan API per il palinsesto giornaliero accurato
-        const res = await fetch(`https://api.jikan.moe/v4/schedules?filter=${day}`);
-        const data = await res.json();
-        container.innerHTML = '';
-        
-        if (!data.data || data.data.length === 0) {
-          container.innerHTML = '<div style="color:#fff;">Nessun anime in onda oggi.</div>'; return;
-        }
-
-        data.data.forEach(item => {
-          const anime = {
-            id: 'jikan_' + item.mal_id, // prefisso speciale
-            mal_id: item.mal_id,
-            title: item.title,
-            coverImage: item.images.jpg.image_url,
-            synopsis: item.synopsis || "Nessuna descrizione disponibile.",
-            episodes: item.episodes ? `${item.episodes} Ep.` : 'In corso',
-            status: item.status,
-            source: 'jikan',
-            genres: item.genres.map(g => g.name)
-          };
-          if(!currentAnimeData.find(a => a.id === anime.id)) currentAnimeData.push(anime);
-
-          const badge = getAnimeBadge(anime.status);
-          const card = document.createElement('div');
-          card.className = 'netflix-card';
-          card.onclick = () => openDetails(anime.id);
-          card.innerHTML = `
-            <img src="${anime.coverImage}" alt="${anime.title}" loading="lazy">
-            <div class="status-badge ${badge.class}">${badge.label}</div>
-            <div class="card-title">${anime.title}</div>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        container.innerHTML = '<div style="color:red; padding: 20px;">Errore nel caricamento del palinsesto.</div>';
-      }
-    }
-
-    // --- NUOVA PAGINA DETTAGLIO ---
+    // --- DETTAGLIO FULL PAGE ---
     function openDetails(id) {
       const anime = currentAnimeData.find(a => a.id === id);
       if (!anime) return;
@@ -568,22 +682,8 @@
       }
 
       showDetailsPage();
-      
-      // Carica Genere ed Episodi in base alla sorgente (Kitsu o Jikan)
-      const epContainer = document.getElementById('detail-episodes-list');
-      const genContainer = document.getElementById('detail-genres');
-      epContainer.innerHTML = '<div style="color:#fff;">Ricerca puntate in corso...</div>';
-      genContainer.innerHTML = '';
-
-      if (anime.source === 'jikan') {
-        anime.genres.forEach(g => {
-          const t = document.createElement('span'); t.className = 'genre-tag'; t.innerText = g; genContainer.appendChild(t);
-        });
-        loadJikanEpisodes(anime.mal_id);
-      } else {
-        loadKitsuGenres(id);
-        loadKitsuEpisodes(id);
-      }
+      loadKitsuGenres(id);
+      loadKitsuEpisodes(id);
     }
 
     async function loadKitsuGenres(id) {
@@ -591,6 +691,7 @@
         const res = await fetch(`https://kitsu.io/api/edge/anime/${id}/categories`);
         const data = await res.json();
         const container = document.getElementById('detail-genres');
+        container.innerHTML = '';
         if (data.data) {
           data.data.slice(0, 5).forEach(c => {
             const t = document.createElement('span'); t.className = 'genre-tag'; t.innerText = c.attributes.title; container.appendChild(t);
@@ -600,10 +701,11 @@
     }
 
     async function loadKitsuEpisodes(id) {
+      const container = document.getElementById('detail-episodes-list');
+      container.innerHTML = '<div style="color:#fff;">Ricerca puntate in corso...</div>';
       try {
-        const res = await fetch(`https://kitsu.io/api/edge/anime/${id}/episodes?page[limit]=20`);
+        const res = await fetch(`https://kitsu.io/api/edge/anime/${id}/episodes?page[limit]=50`);
         const data = await res.json();
-        const container = document.getElementById('detail-episodes-list');
         container.innerHTML = '';
         if (!data.data || data.data.length === 0) { container.innerHTML = '<div class="episode-card">Nessuna puntata indicizzata.</div>'; return; }
 
@@ -613,22 +715,7 @@
           const date = ep.attributes.airdate ? new Date(ep.attributes.airdate).toLocaleDateString('it-IT') : 'N.D.';
           container.innerHTML += `<div class="episode-card"><span class="ep-title">Ep. ${num}: ${title}</span><span class="ep-date">📅 ${date}</span></div>`;
         });
-      } catch (e) { document.getElementById('detail-episodes-list').innerHTML = '<div style="color:red;">Errore.</div>'; }
-    }
-
-    async function loadJikanEpisodes(mal_id) {
-      try {
-        const res = await fetch(`https://api.jikan.moe/v4/anime/${mal_id}/episodes`);
-        const data = await res.json();
-        const container = document.getElementById('detail-episodes-list');
-        container.innerHTML = '';
-        if (!data.data || data.data.length === 0) { container.innerHTML = '<div class="episode-card">Nessuna puntata indicizzata.</div>'; return; }
-
-        data.data.forEach(ep => {
-          const date = ep.aired ? new Date(ep.aired).toLocaleDateString('it-IT') : 'N.D.';
-          container.innerHTML += `<div class="episode-card"><span class="ep-title">Ep. ${ep.mal_id}: ${ep.title}</span><span class="ep-date">📅 ${date}</span></div>`;
-        });
-      } catch (e) { document.getElementById('detail-episodes-list').innerHTML = '<div style="color:red;">Errore.</div>'; }
+      } catch (e) { container.innerHTML = '<div style="color:red;">Errore nel caricamento puntate.</div>'; }
     }
 
     function toggleSaveAnime() {
@@ -643,13 +730,13 @@
       } else {
         savedList.push(anime);
         document.getElementById('save-btn').innerText = "❌ Rimuovi dai Preferiti";
+        addNotification(anime.title, "➕ Aggiunto ai tuoi anime preferiti!", 'favorite_add', anime.id);
       }
       localStorage.setItem(`binge_saved_${currentUser}`, JSON.stringify(savedList));
       renderFavoritesRow();
     }
 
-    function showScheduleMenu() { toggleMenu(); document.getElementById('day-select').focus(); goHome(); }
-
+    // --- IMPORT & EXPORT ---
     function exportHistory() {
       if (savedList.length === 0) return alert("Nessun anime da esportare.");
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedList, null, 2));
@@ -677,7 +764,7 @@
       reader.readAsText(file);
     }
 
-    // Avvio
+    // AVVIO
     initUserSession();
   </script>
 </body>
