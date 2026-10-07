@@ -1,25 +1,39 @@
 ```html
 <!DOCTYPE html>
-<html lang="it" class="dark">
+<html lang="it" class="dark h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BINGE 🍿 - Traccia e Scopri i tuoi Anime Preferiti</title>
+  <title>BINGE 🍿 - Dark Netflix Anime Hub</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts - Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
           colors: {
-            brand: {
-              dark: '#0a0f1d',
-              card: '#161f36',
-              border: '#263352',
+            binge: {
+              bg: '#0f172a',
+              card: '#1e293b',
+              cardHover: '#334155',
               accent: '#38bdf8',
-              glow: 'rgba(56, 189, 248, 0.15)'
+              accentHover: '#0284c7',
+              red: '#e11d48',
+              redHover: '#be123c',
+              gold: '#f59e0b',
+              emerald: '#10b981'
             }
           }
         }
@@ -27,943 +41,1450 @@
     }
   </script>
 
+  <!-- Custom Scrollbar & Animations -->
   <style>
-    /* Custom scrollbar for horizontal movie rows */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
     }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar {
-      height: 6px;
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
+    ::-webkit-scrollbar-track {
       background: #0f172a;
-      border-radius: 8px;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
+    ::-webkit-scrollbar-thumb {
       background: #334155;
-      border-radius: 8px;
+      border-radius: 4px;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #38bdf8;
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
     }
 
-    /* Glassmorphism effects */
-    .glass-header {
-      background: rgba(10, 15, 29, 0.85);
+    .glass-nav {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .glass-card {
-      background: rgba(22, 31, 54, 0.7);
-      backdrop-filter: blur(8px);
+
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Smooth Slide animations */
+    .drawer-transition {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
+      50% { box-shadow: 0 0 25px rgba(56, 189, 248, 0.6); }
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 2s infinite;
     }
   </style>
 </head>
-<body class="bg-[#0a0f1d] text-slate-100 font-sans min-h-screen flex flex-col selection:bg-sky-500 selection:text-white pb-12">
+<body class="bg-binge-bg text-slate-100 font-sans antialiased min-h-full flex flex-col selection:bg-binge-accent selection:text-slate-900">
 
-  <!-- HEADER GLOBALE -->
-  <header class="glass-header fixed top-0 left-0 right-0 z-50 border-b border-slate-800/80 px-4 lg:px-8 py-3.5 transition-all">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+  <!-- HEADER / NAVBAR -->
+  <header class="sticky top-0 z-40 glass-nav border-b border-slate-800/80 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
       
-      <!-- LOGO -->
-      <div onclick="goHome()" class="flex items-center gap-2 cursor-pointer group select-none">
-        <div class="bg-gradient-to-tr from-sky-500 to-indigo-600 text-white p-2 rounded-xl font-black text-xl shadow-lg shadow-sky-500/20 group-hover:scale-105 transition-transform">
-          🍿
-        </div>
-        <span class="text-2xl font-extrabold tracking-wider bg-gradient-to-r from-sky-400 via-indigo-300 to-white bg-clip-text text-transparent">
-          BINGE
-        </span>
+      <!-- Logo & Brand -->
+      <div class="flex items-center gap-8">
+        <a href="#" id="brandLogo" class="flex items-center gap-2 group cursor-pointer">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 via-binge-red to-orange-500 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-rose-900/40 group-hover:scale-105 transition-transform">
+            🍿
+          </div>
+          <span class="text-2xl font-extrabold tracking-wider bg-gradient-to-r from-white via-slate-200 to-binge-accent bg-clip-text text-transparent">
+            BINGE
+          </span>
+        </a>
+
+        <!-- Main Navigation Links -->
+        <nav class="hidden md:flex items-center gap-1">
+          <button id="navHomeBtn" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center gap-2 bg-slate-800/40">
+            <i class="fa-solid fa-compass text-binge-accent"></i> Esplora
+          </button>
+          <button id="navPopularBtn" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center gap-2">
+            <i class="fa-solid fa-fire text-amber-500"></i> Popolari
+          </button>
+          <button id="navFavsBtn" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center gap-2 relative">
+            <i class="fa-solid fa-heart text-rose-500"></i> Preferiti
+            <span id="favCountBadge" class="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 hidden">0</span>
+          </button>
+        </nav>
       </div>
 
-      <!-- HEADER ACTIONS -->
+      <!-- Search Bar -->
+      <div class="flex-1 max-w-md relative hidden sm:block">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input type="text" id="searchInput" placeholder="Cerca anime, serie o film (es. Demon Slayer, Attack on Titan)..." 
+            class="w-full bg-slate-800/70 border border-slate-700/80 rounded-xl pl-10 pr-10 py-2 text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:border-binge-accent focus:ring-1 focus:ring-binge-accent transition-all">
+          <button id="clearSearchBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hidden">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Header Actions -->
       <div class="flex items-center gap-3">
-        
-        <!-- CAMPANELLA NOTIFICHE -->
-        <button onclick="toggleNotifications()" class="relative p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-slate-200 transition-colors shadow-md">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-          </svg>
-          <span id="notif-count" class="hidden absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-[#0a0f1d] animate-pulse">
-            0
-          </span>
+        <!-- Mobile Search Toggle -->
+        <button id="mobileSearchToggleBtn" class="sm:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800">
+          <i class="fa-solid fa-magnifying-glass text-lg"></i>
         </button>
 
-        <!-- MENU UTENTE DROPDOWN -->
+        <!-- Notification Bell -->
         <div class="relative">
-          <button id="main-menu-btn" onclick="toggleMenu()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs sm:text-sm font-semibold text-slate-200 transition-all shadow-md">
-            <span>🔒 Accedi</span>
-            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
+          <button id="notifBellBtn" class="relative p-2.5 rounded-xl text-slate-300 hover:text-white bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 transition-colors focus:outline-none">
+            <i class="fa-regular fa-bell text-lg"></i>
+            <span id="notifBadge" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-binge-red text-white text-xs font-bold flex items-center justify-center shadow-md animate-pulse hidden">0</span>
+          </button>
+        </div>
+
+        <!-- User Profile Menu Container -->
+        <div class="relative" id="userMenuContainer">
+          <button id="userProfileBtn" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 transition-colors">
+            <img id="userAvatarImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-7 h-7 rounded-lg object-cover ring-2 ring-binge-accent/40">
+            <span id="userNameText" class="text-xs font-semibold text-slate-200 hidden md:inline-block max-w-[90px] truncate">Ospite</span>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-400 mr-1"></i>
           </button>
 
-          <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden backdrop-blur-xl">
-            <div id="auth-menu-items" class="py-1">
-              <!-- Popolato via JS -->
+          <!-- User Dropdown Menu (NOTICE: "Home" item is removed according to requirement 2) -->
+          <div id="userDropdown" class="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl py-2 hidden z-50 transform origin-top-right transition-all">
+            <div class="px-4 py-2 border-b border-slate-700/70 mb-1">
+              <p id="dropdownUsername" class="text-sm font-bold text-white truncate">Utente Demo</p>
+              <p id="dropdownEmail" class="text-xs text-slate-400 truncate">demo@binge.tv</p>
             </div>
-            <div class="border-t border-slate-800/80 py-1">
-              <button onclick="goHome(); toggleMenu();" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800/60 hover:text-white flex items-center gap-2 transition">
-                <span>🏠 Home</span>
-              </button>
-            </div>
+            
+            <button id="btnExportFavs" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-binge-accent flex items-center gap-2 transition-colors">
+              <i class="fa-solid fa-file-export w-4 text-binge-accent"></i> Esporta Preferiti (JSON)
+            </button>
+            
+            <label class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-700/60 hover:text-binge-accent flex items-center gap-2 transition-colors cursor-pointer">
+              <i class="fa-solid fa-file-import w-4 text-emerald-400"></i> Importa Preferiti (JSON)
+              <input type="file" id="importJsonInput" accept=".json" class="hidden">
+            </label>
+
+            <div class="border-t border-slate-700/70 my-1"></div>
+
+            <button id="btnLogout" class="w-full text-left px-4 py-2 text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2 transition-colors">
+              <i class="fa-solid fa-arrow-right-from-bracket w-4"></i> Disconnetti
+            </button>
           </div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- Mobile Search Row -->
+    <div id="mobileSearchRow" class="px-4 pb-3 sm:hidden hidden">
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input type="text" id="mobileSearchInput" placeholder="Cerca anime o franchising..." 
+          class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-10 pr-10 py-2 text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:border-binge-accent">
       </div>
     </div>
   </header>
 
-  <!-- DRAWER NOTIFICHE -->
-  <div id="notif-drawer" class="hidden fixed top-16 right-4 sm:right-8 w-80 sm:w-96 bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl z-50 p-4 backdrop-blur-xl max-h-[80vh] flex flex-col">
-    <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+  <!-- NOTIFICATION DRAWER (SLIDE-OVER PANEL) -->
+  <div id="notifDrawerOverlay" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden transition-opacity"></div>
+  <aside id="notifDrawer" class="fixed right-0 top-0 bottom-0 w-full sm:w-96 bg-slate-900 border-l border-slate-800 z-50 flex flex-col translate-x-full drawer-transition shadow-2xl">
+    <!-- Drawer Header -->
+    <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
       <div class="flex items-center gap-2">
-        <span class="text-lg">🔔</span>
-        <h3 class="font-bold text-sm text-slate-100">Notifiche Preferiti</h3>
+        <i class="fa-solid fa-bell text-binge-accent text-lg"></i>
+        <h3 class="font-bold text-slate-100">Centro Notifiche</h3>
+        <span id="drawerUnreadBadge" class="text-xs px-2 py-0.5 rounded-full bg-binge-accent/20 text-binge-accent font-semibold">0 nuove</span>
       </div>
-      <button onclick="clearAllNotifications()" class="text-xs text-sky-400 hover:text-sky-300 font-semibold px-2 py-1 rounded hover:bg-slate-800 transition">
-        Svuota tutto
+      <button id="closeNotifDrawerBtn" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800">
+        <i class="fa-solid fa-xmark text-lg"></i>
       </button>
     </div>
-    <div id="notif-list-container" class="overflow-y-auto custom-scrollbar flex-1 space-y-2 pr-1">
-      <div class="text-center text-xs text-slate-500 py-8">Nessuna nuova notifica.</div>
-    </div>
-  </div>
 
-  <!-- MODAL AUTENTICAZIONE UTENTE -->
-  <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl relative">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold">
-        &times;
+    <!-- Drawer Controls -->
+    <div class="px-4 py-2 border-b border-slate-800/60 bg-slate-950/40 flex items-center justify-between text-xs">
+      <button id="btnMarkAllRead" class="text-binge-accent hover:underline font-medium">
+        <i class="fa-solid fa-check-double mr-1"></i> Segna tutte lette
       </button>
-      
-      <div class="text-center mb-6">
-        <div class="inline-block p-3 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 mb-2">
-          👤
-        </div>
-        <h2 class="text-xl font-extrabold text-white">Accedi a BINGE</h2>
-        <p class="text-xs text-slate-400 mt-1">Salva i tuoi preferiti e ricevi notifiche dedicate</p>
-      </div>
-
-      <div id="auth-error" class="hidden mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs text-center"></div>
-
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Username</label>
-          <input type="text" id="auth-username" placeholder="Inserisci il tuo username" class="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
-          <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition">
-        </div>
-        <button onclick="handleLogin()" class="w-full mt-2 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl text-sm shadow-lg shadow-sky-500/20 transition transform active:scale-95">
-          🔑 Accedi
-        </button>
-        <button onclick="handleRegister()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 rounded-xl text-sm border border-slate-700/60 transition">
-          📝 Registra nuovo Account
-        </button>
-      </div>
+      <button id="btnClearNotifs" class="text-slate-400 hover:text-rose-400 font-medium">
+        <i class="fa-solid fa-trash-can mr-1"></i> Svuota
+      </button>
     </div>
-  </div>
 
-  <input type="file" id="import-file" class="hidden" accept=".json" onchange="importHistory(event)">
+    <!-- Drawer Body List -->
+    <div id="notifListContainer" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- Dynamic notification cards inserted here -->
+    </div>
+  </aside>
 
-  <!-- CONTAINER PER MESSAGGI TOAST -->
-  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-  <main class="flex-1 mt-20 px-4 lg:px-8 max-w-7xl mx-auto w-full">
-
-    <!-- ==================== VISTA HOME ==================== -->
-    <div id="view-home" class="space-y-8">
+  <!-- MAIN CONTENT VIEWER -->
+  <main class="flex-1 flex flex-col relative max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- VIEW 1: HOME CATALOG (POPULAR, TRENDING, FAVS, RECOMMENDATIONS) -->
+    <div id="viewHome" class="space-y-8 animate-fade-in">
       
-      <!-- CONTROLI DI RICERCA E FILTRI -->
-      <section class="flex flex-col md:flex-row gap-3 pt-2">
-        <div class="relative flex-1">
-          <svg class="w-5 h-5 absolute left-3.5 top-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
-          <input type="text" id="search-input" placeholder="🔍 Cerca qualsiasi anime..." oninput="handleSearch()" class="w-full bg-slate-900/90 border border-slate-800 focus:border-sky-500 rounded-2xl pl-11 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none transition shadow-inner">
-        </div>
-
-        <select id="year-select" onchange="filterByYear()" class="bg-slate-900/90 border border-slate-800 focus:border-sky-500 rounded-2xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none transition cursor-pointer">
-          <option value="">📅 Seleziona Annata</option>
-          <option value="2020..2026">Anni 2020+</option>
-          <option value="2010..2019">Anni 2010-2019</option>
-          <option value="2000..2009">Anni 2000-2009</option>
-          <option value="1990..1999">Anni '90 e precedenti</option>
-        </select>
-      </section>
-
-      <!-- RISULTATI DELLA RICERCA -->
-      <section id="searchResultsSection" class="hidden space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-          <h2 id="search-title" class="text-lg font-extrabold text-white flex items-center gap-2">
-            <span>🔎 Risultati della Ricerca</span>
-          </h2>
-          <button onclick="resetSearch()" class="text-xs text-sky-400 hover:underline">Ripristina Home</button>
-        </div>
-        <div id="search-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
-      </section>
-
-      <!-- SEZIONI ROW HOME -->
-      <div id="mainRows" class="space-y-8">
+      <!-- HERO FEATURED FRANCHISE BANNER -->
+      <section id="heroSection" class="relative rounded-3xl overflow-hidden bg-slate-800 border border-slate-800 min-h-[340px] sm:min-h-[420px] flex items-end shadow-2xl">
+        <div id="heroBgImage" class="absolute inset-0 bg-cover bg-center transition-all duration-700 scale-105" style="background-image: url('https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1600&q=80');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent"></div>
         
-        <!-- PREFERITI -->
-        <section class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 id="favorites-title" class="text-lg font-bold text-white flex items-center gap-2">
-              <span>❤️ I Tuoi Preferiti</span>
-            </h2>
-          </div>
-          <div id="row-favorites" class="flex gap-4 overflow-x-auto no-scrollbar py-2 custom-scrollbar"></div>
-        </section>
-
-        <!-- NUOVE USCITE -->
-        <section class="space-y-3">
-          <h2 class="text-lg font-bold text-white flex items-center gap-2">
-            <span>🌟 Nuove Uscite</span>
-          </h2>
-          <div id="row-new-releases" class="flex gap-4 overflow-x-auto no-scrollbar py-2 custom-scrollbar"></div>
-        </section>
-
-        <!-- CONSIGLIATI PER TE -->
-        <section class="space-y-3">
-          <h2 class="text-lg font-bold text-white flex items-center gap-2">
-            <span>🤖 Consigliati per Te</span>
-          </h2>
-          <div id="row-ai-recommendations" class="flex gap-4 overflow-x-auto no-scrollbar py-2 custom-scrollbar"></div>
-        </section>
-
-        <!-- I POPOLARI DEL MOMENTO -->
-        <section class="space-y-3">
-          <h2 class="text-lg font-bold text-white flex items-center gap-2">
-            <span>🔥 Popolari del Momento</span>
-          </h2>
-          <div id="row-top-ita" class="flex gap-4 overflow-x-auto no-scrollbar py-2 custom-scrollbar"></div>
-        </section>
-
-      </div>
-    </div>
-
-    <!-- ==================== VISTA DETTAGLIO FULL-PAGE ==================== -->
-    <div id="view-details" class="hidden space-y-6 animate-fadeIn pb-12">
-      
-      <!-- BOTTONE TORNA INDIETRO -->
-      <button onclick="goHome()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-sky-400 font-semibold text-sm transition group">
-        <span class="group-hover:-translate-x-1 transition-transform">⬅</span> Torna Indietro
-      </button>
-
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-        
-        <!-- COLONNA SINISTRA: POSTER E AZIONI -->
-        <div class="md:col-span-4 lg:col-span-3 space-y-4 md:sticky md:top-24">
-          <div class="relative rounded-2xl overflow-hidden border border-slate-800 shadow-2xl group">
-            <img id="detail-poster" src="" alt="Anime Poster" class="w-full object-cover aspect-[2/3] transform group-hover:scale-105 transition duration-500">
-            <div id="detail-status" class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-black text-white shadow-lg uppercase backdrop-blur-md"></div>
+        <div class="relative p-6 sm:p-10 max-w-2xl z-10 space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-binge-red text-white flex items-center gap-1 shadow-lg shadow-rose-900/50">
+              <i class="fa-solid fa-fire"></i> Franchising #1
+            </span>
+            <span id="heroArcBadge" class="px-3 py-1 rounded-full text-xs font-medium bg-slate-800/80 backdrop-blur-md text-binge-accent border border-slate-700">
+              5 Stagioni & Archi
+            </span>
           </div>
 
-          <div class="space-y-2">
-            <button id="save-btn" onclick="toggleSaveAnime()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-sky-500/20 transition transform active:scale-95 flex items-center justify-center gap-2">
-              <span>➕ Aggiungi ai Preferiti</span>
+          <h1 id="heroTitle" class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-none drop-shadow-md">
+            Demon Slayer: Kimetsu no Yaiba
+          </h1>
+
+          <p id="heroSynopsis" class="text-sm sm:text-base text-slate-300 line-clamp-3 leading-relaxed drop-shadow">
+            Unificato sotto un'unica voce: Segui le avventure di Tanjiro attraverso la Stagione 1, l'Arco del Treno Mugen, l'Arco del Quartiere dei Piaceri, il Villaggio dei Farai e l'Allenamento dei Pilastri!
+          </p>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button id="heroOpenBtn" class="px-6 py-3 rounded-xl bg-binge-accent hover:bg-binge-accentHover text-slate-950 font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-sky-500/20 hover:scale-105">
+              <i class="fa-solid fa-play"></i> Esplora Franchising
             </button>
-
-            <button onclick="simulateNotification()" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 font-semibold text-xs transition flex items-center justify-center gap-2">
-              <span>🔔 Testa Notifica Simulata</span>
+            <button id="heroFavBtn" class="px-4 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-white font-medium text-sm border border-slate-700 backdrop-blur-md transition-all flex items-center gap-2">
+              <i class="fa-regular fa-heart text-rose-400"></i> Salva
             </button>
           </div>
         </div>
+      </section>
 
-        <!-- COLONNA DESTTRA: METADATI E PUNTATE -->
-        <div class="md:col-span-8 lg:col-span-9 space-y-6">
-          
-          <div>
-            <h1 id="detail-title" class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">Title</h1>
+      <!-- GENRE / CATEGORY QUICK FILTERS -->
+      <section class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <button data-genre="all" class="genre-pill px-4 py-2 rounded-xl text-xs font-bold bg-binge-accent text-slate-950 whitespace-nowrap transition-all shadow-md">
+          Tutti i Franchising
+        </button>
+        <button data-genre="azione" class="genre-pill px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60 whitespace-nowrap transition-all">
+          🔥 Azione & Shounen
+        </button>
+        <button data-genre="fantasy" class="genre-pill px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60 whitespace-nowrap transition-all">
+          🧙 Dark Fantasy
+        </button>
+        <button data-genre="sci-fi" class="genre-pill px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60 whitespace-nowrap transition-all">
+          🤖 Sci-Fi & Mecha
+        </button>
+        <button data-genre="drammatico" class="genre-pill px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60 whitespace-nowrap transition-all">
+          🎭 Drammatico & Psicologico
+        </button>
+      </section>
+
+      <!-- SECTION 1: POPULAR FRANCHISES (UNIFIED POSTERS) -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-6 bg-binge-accent rounded-full"></div>
+            <h2 class="text-xl font-bold text-white tracking-wide">🔥 Popolari & Di Tendenza (Franchising Riuniti)</h2>
+          </div>
+          <span class="text-xs text-slate-400 font-medium">1 locandina per serie</span>
+        </div>
+
+        <div id="popularGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+          <!-- Dynamic cards injected here -->
+        </div>
+      </section>
+
+      <!-- SECTION 2: TOP RATED & RECOMMENDED -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-6 bg-amber-500 rounded-full"></div>
+            <h2 class="text-xl font-bold text-white tracking-wide">🏆 Più Votati & Consigliati</h2>
+          </div>
+        </div>
+
+        <div id="topGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+          <!-- Dynamic cards injected here -->
+        </div>
+      </section>
+
+      <!-- SECTION 3: NEW RELEASES & AIRING -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-6 bg-emerald-500 rounded-full"></div>
+            <h2 class="text-xl font-bold text-white tracking-wide">✨ Nuove Uscite & In Onda</h2>
+          </div>
+        </div>
+
+        <div id="airingGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+          <!-- Dynamic cards injected here -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- VIEW 2: SEARCH RESULTS (UNIFIED FRANCHISES) -->
+    <div id="viewSearch" class="space-y-6 hidden">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Risultati della Ricerca</h2>
+          <p id="searchSubtext" class="text-sm text-slate-400">Raggruppati per serie / franchising principale</p>
+        </div>
+        <button id="closeSearchBtn" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold">
+          <i class="fa-solid fa-xmark mr-1"></i> Chiudi ricerca
+        </button>
+      </div>
+
+      <div id="searchGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+        <!-- Dynamic search results -->
+      </div>
+      <div id="searchEmptyState" class="hidden text-center py-16 space-y-3">
+        <i class="fa-solid fa-ghost text-4xl text-slate-600"></i>
+        <p class="text-slate-400 text-base">Nessun anime trovato. Prova con parole chiave differenti.</p>
+      </div>
+    </div>
+
+    <!-- VIEW 3: FAVORITES VIEW -->
+    <div id="viewFavs" class="space-y-6 hidden">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-heart text-rose-500"></i> I Miei Franchising Preferiti
+          </h2>
+          <p class="text-sm text-slate-400">Riceverai notifiche su nuove stagioni e aggiornamenti per questi anime.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnFavExport2" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-download text-binge-accent"></i> Esporta
+          </button>
+        </div>
+      </div>
+
+      <div id="favsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+        <!-- Dynamic saved favorites cards -->
+      </div>
+      <div id="favsEmptyState" class="hidden text-center py-20 space-y-4">
+        <div class="w-16 h-16 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center mx-auto text-2xl text-slate-500">
+          <i class="fa-regular fa-heart"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-300">Nessun Preferito Salvato</h3>
+        <p class="text-sm text-slate-500 max-w-sm mx-auto">Clicca sul cuore nelle locandine o nella pagina dettaglio per salvare un franchising e ricevere notifiche!</p>
+      </div>
+    </div>
+
+    <!-- VIEW 4: UNIFIED FULL-SCREEN DETAIL VIEW WITH SEASONS/ARCS TABS -->
+    <div id="viewDetail" class="hidden space-y-8 animate-fade-in">
+      <!-- Back button header -->
+      <div class="flex items-center justify-between">
+        <button id="btnBackToCatalog" class="px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700/80 flex items-center gap-2 transition-all">
+          <i class="fa-solid fa-arrow-left"></i> Torna al Catalogo
+        </button>
+        <div class="flex items-center gap-2">
+          <span id="detailStatusBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            In Corso / Airing
+          </span>
+        </div>
+      </div>
+
+      <!-- Main Detail Card Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Poster, Favorites & Test Notification Action -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="relative rounded-3xl overflow-hidden border border-slate-700/60 shadow-2xl bg-slate-800 group">
+            <img id="detailPoster" src="" alt="Poster" class="w-full h-[420px] sm:h-[480px] object-cover transition-transform duration-500 group-hover:scale-105">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80"></div>
             
-            <div class="flex flex-wrap items-center gap-3 text-sm font-semibold text-slate-400 mb-4">
-              <span id="detail-episodes" class="bg-slate-900 border border-slate-800 px-3 py-1 rounded-lg text-sky-400">📺 -- Ep.</span>
+            <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs font-bold">
+              <span id="detailRatingBadge" class="px-3 py-1.5 rounded-xl bg-slate-900/90 backdrop-blur-md text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                <i class="fa-solid fa-star"></i> 8.8 / 10
+              </span>
+              <span id="detailRankBadge" class="px-3 py-1.5 rounded-xl bg-slate-900/90 backdrop-blur-md text-sky-400 border border-sky-500/30">
+                # Top Franchising
+              </span>
             </div>
-
-            <!-- TAG GENERE -->
-            <div id="detail-genres" class="flex flex-wrap gap-2"></div>
           </div>
 
-          <!-- DESCRIZIONE TRAMA -->
-          <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 backdrop-blur-sm">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Sinossi / Trama</h3>
-            <p id="detail-description" class="text-sm text-slate-300 leading-relaxed font-normal">--</p>
+          <!-- Action Buttons -->
+          <div class="space-y-2">
+            <!-- Favorite Toggle Button -->
+            <button id="detailFavToggleBtn" class="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-all flex items-center justify-center gap-2 shadow-lg">
+              <i class="fa-regular fa-heart text-rose-500 text-base"></i> Salva Franchising nei Preferiti
+            </button>
+
+            <!-- Test Simulated Notification Button (Requirement 3) -->
+            <button id="detailTestNotifBtn" class="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-binge-accent border border-sky-500/30 transition-all flex items-center justify-center gap-2 shadow-lg hover:border-sky-400">
+              <i class="fa-solid fa-bell text-binge-accent animate-bounce"></i> Testa Notifica Simulata
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column: Details, Season/Arc Selector, Episodes List -->
+        <div class="lg:col-span-8 space-y-6">
+          
+          <!-- Header Info -->
+          <div>
+            <h1 id="detailFranchiseTitle" class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+              Demon Slayer: Kimetsu no Yaiba
+            </h1>
+            <p id="detailAltTitle" class="text-sm text-slate-400 mt-1 font-medium">鬼滅の刃 • Kimetsu no Yaiba Series</p>
+            
+            <div id="detailGenres" class="flex flex-wrap gap-2 mt-3">
+              <!-- Dynamic genre tags -->
+            </div>
           </div>
 
-          <!-- LISTA EPISODI / PUNTATE -->
-          <div class="space-y-4 pt-2">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                <span>📜 Elenco Puntate</span>
-              </h2>
+          <!-- UNIFIED SEASONS, ARCS & MOVIES SELECTOR SECTION (Requirement 1) -->
+          <div class="bg-slate-800/80 rounded-2xl p-4 sm:p-5 border border-slate-700/80 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold uppercase tracking-wider text-binge-accent flex items-center gap-2">
+                <i class="fa-solid fa-layer-group"></i> Seleziona Stagione, Arco o Film:
+              </label>
+              <span id="seasonCountLabel" class="text-xs text-slate-400 font-medium">5 Elementi Collegati</span>
             </div>
 
-            <div id="detail-episodes-list" class="space-y-2.5 min-h-[150px]">
-              <!-- Popolato dinamicamente da JS -->
+            <!-- Tab / Dropdown Selector Container -->
+            <div id="seasonTabsContainer" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+              <!-- Dynamic Season/Arc Pills inserted here -->
+            </div>
+          </div>
+
+          <!-- Active Arc / Season Metadata & Synopsis -->
+          <div class="glass-card rounded-2xl p-5 space-y-3 border border-slate-700/60">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span id="activeArcTitle" class="font-bold text-sm text-white">Stagione 1</span>
+              <div class="flex items-center gap-3">
+                <span id="activeArcYear"><i class="fa-regular fa-calendar mr-1"></i> 2019</span>
+                <span id="activeArcEps"><i class="fa-solid fa-tv mr-1"></i> 26 Episodi</span>
+              </div>
+            </div>
+
+            <p id="activeArcSynopsis" class="text-sm text-slate-300 leading-relaxed">
+              Caricamento descrizione stagione...
+            </p>
+
+            <!-- Overall Watch Progress Bar -->
+            <div class="pt-2 space-y-1">
+              <div class="flex justify-between text-xs font-semibold">
+                <span class="text-slate-400">Progresso Visione Arco:</span>
+                <span id="arcProgressText" class="text-binge-accent">0 / 0 Episodi (0%)</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-700">
+                <div id="arcProgressBar" class="bg-gradient-to-r from-binge-accent to-emerald-400 h-full w-0 transition-all duration-500"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EPISODES LIST SECTION (Requirement 5: Resilient episodes) -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-[#38bdf8] fa-list"></i> Elenco Puntate
+              </h3>
+              <button id="btnMarkAllEpsWatched" class="text-xs font-semibold text-slate-400 hover:text-binge-accent transition-colors">
+                <i class="fa-solid fa-check-double mr-1"></i> Segna tutte viste
+              </button>
+            </div>
+
+            <!-- Episodes Container -->
+            <div id="episodesList" class="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
+              <!-- Dynamic Episode items -->
             </div>
           </div>
 
         </div>
 
       </div>
-
     </div>
 
   </main>
 
+  <!-- MODAL: AUTHENTICATION (LOGIN / REGISTER) -->
+  <div id="authModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 relative">
+      <button id="closeAuthModalBtn" class="absolute right-5 top-5 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-600 to-binge-accent text-white font-black text-2xl flex items-center justify-center mx-auto shadow-lg">
+          🍿
+        </div>
+        <h2 id="authModalTitle" class="text-2xl font-extrabold text-white">Accedi a BINGE</h2>
+        <p class="text-xs text-slate-400">Gestisci i tuoi preferiti, notifiche ed episodi visti.</p>
+      </div>
+
+      <form id="authForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Nome Utente</label>
+          <input type="text" id="authUsername" required placeholder="es. OtakuMaster" 
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-binge-accent">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+          <input type="password" id="authPassword" required placeholder="••••••••" 
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-binge-accent">
+        </div>
+
+        <button type="submit" id="authSubmitBtn" class="w-full py-3 rounded-xl bg-binge-accent hover:bg-binge-accentHover text-slate-950 font-bold text-sm transition-all shadow-lg shadow-sky-500/20">
+          Accedi
+        </button>
+      </form>
+
+      <div class="text-center">
+        <button id="toggleAuthModeBtn" class="text-xs text-binge-accent hover:underline">
+          Non hai un account? Registrati ora
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 py-6 bg-slate-950 text-center text-xs text-slate-500">
+    <p>BINGE 🍿 Anime Hub & Notifications — Powered by Kitsu API</p>
+  </footer>
+
   <script>
-    /* ==========================================================================
-       GESTIONE STATO GLOBALE ED APPLICAZIONE
-       ========================================================================== */
-    let currentUser = localStorage.getItem('binge_current_user') || null;
-    let usersDb = JSON.parse(localStorage.getItem('binge_users_db') || '{}');
-    let savedList = []; 
-    let userNotifications = [];
-    let currentAnimeData = [];
-    let selectedAnimeId = null;
-    let searchTimeout = null;
+    // MAIN APPLICATION STATE
+    const APP_STATE = {
+      currentUser: null,
+      favs: [],
+      notifications: [],
+      watchHistory: {}, // { arcId_epNum: true }
+      popularFranchises: [],
+      topFranchises: [],
+      airingFranchises: [],
+      currentDetailFranchise: null,
+      activeArcIndex: 0,
+      activeGenreFilter: 'all',
+      isAuthRegisterMode: false
+    };
 
-    /* --- TOAST NOTIFICATIONS (NO ALERT) --- */
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      if(!container) return;
-
-      const toast = document.createElement('div');
-      let bg = 'bg-slate-800/95 border-sky-500/80 text-sky-200';
-      if(type === 'error') bg = 'bg-rose-950/95 border-rose-500/80 text-rose-200';
-      if(type === 'success') bg = 'bg-emerald-950/95 border-emerald-500/80 text-emerald-200';
-
-      toast.className = `pointer-events-auto p-3.5 rounded-xl border ${bg} shadow-2xl backdrop-blur-md text-xs sm:text-sm font-medium flex items-center justify-between gap-3 transform translate-y-2 opacity-0 transition-all duration-300 max-w-sm w-full`;
-      toast.innerHTML = `
-        <span>${escapeHtml(message)}</span>
-        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white font-bold text-base leading-none">&times;</button>
-      `;
-      container.appendChild(toast);
-
-      requestAnimationFrame(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
-      });
-
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
-      }, 4000);
-    }
-
-    function escapeHtml(str) {
-      if(!str) return '';
-      return str.replace(/[&<>"']/g, function(m) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-      });
-    }
-
-    /* --- NAVIGAZIONE PAGO VISTE --- */
-    function goHome() {
-      document.getElementById('view-details').classList.add('hidden');
-      document.getElementById('view-home').classList.remove('hidden');
-      document.getElementById('notif-drawer').classList.add('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    
-    function showDetailsPage() {
-      document.getElementById('view-home').classList.add('hidden');
-      document.getElementById('view-details').classList.remove('hidden');
-      document.getElementById('notif-drawer').classList.add('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function toggleMenu() { 
-      document.getElementById('dropdown-menu').classList.toggle('hidden'); 
-    }
-
-    /* --- SISTEMA AUTENTICAZIONE UTENTI --- */
-    function initUserSession() {
-      if (currentUser) {
-        savedList = JSON.parse(localStorage.getItem(`binge_saved_${currentUser}`) || '[]');
-        userNotifications = JSON.parse(localStorage.getItem(`binge_notifs_${currentUser}`) || '[]');
-        
-        document.getElementById('main-menu-btn').innerHTML = `<span>👤 ${escapeHtml(currentUser)}</span> <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
-        document.getElementById('favorites-title').innerHTML = `<span>❤️ Preferiti di ${escapeHtml(currentUser)}</span>`;
-        document.getElementById('auth-menu-items').innerHTML = `
-          <button onclick="exportHistory()" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800/60 hover:text-white flex items-center gap-2">📥 Esporta Preferiti</button>
-          <button onclick="triggerImport()" class="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:bg-slate-800/60 hover:text-white flex items-center gap-2">📤 Importa Preferiti</button>
-          <button onclick="logout()" class="w-full text-left px-4 py-2.5 text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2">🚪 Esci (Logout)</button>
-        `;
-        checkFavoritesUpdates();
-      } else {
-        savedList = [];
-        userNotifications = [];
-        document.getElementById('main-menu-btn').innerHTML = `<span>🔒 Accedi</span> <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
-        document.getElementById('favorites-title').innerHTML = `<span>❤️ Preferiti (Accedi per salvare)</span>`;
-        document.getElementById('auth-menu-items').innerHTML = `
-          <button onclick="openAuthModal()" class="w-full text-left px-4 py-2.5 text-xs text-sky-400 hover:bg-slate-800/60 flex items-center gap-2 font-semibold">🔑 Accedi / Registrati</button>
-        `;
+    // KNOWN POPULAR FRANCHISES DICTIONARY FOR PRECISE GROUPING & UNIFICATION
+    const KNOWN_FRANCHISES = [
+      {
+        id: 'franchise-demon-slayer',
+        title: 'Demon Slayer: Kimetsu no Yaiba',
+        searchQuery: 'Kimetsu no Yaiba',
+        coverUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Azione', 'Fantasy', 'Shounen', 'Soprannaturale'],
+        arcs: [
+          { id: 14190, name: 'Stagione 1 (Tanjiro Kamado Unwavering Resolve)', eps: 26, year: 2019, status: 'Concluso' },
+          { id: 42765, name: 'Arco del Treno Mugen (Mugen Train Arc)', eps: 7, year: 2021, status: 'Concluso' },
+          { id: 44081, name: 'Arco del Quartiere dei Piaceri (Entertainment District)', eps: 11, year: 2021, status: 'Concluso' },
+          { id: 46279, name: 'Arco del Villaggio dei Farai (Swordsmith Village)', eps: 11, year: 2023, status: 'Concluso' },
+          { id: 48068, name: 'Arco dell\'Allenamento dei Pilastri (Hashira Training)', eps: 8, year: 2024, status: 'Concluso' }
+        ]
+      },
+      {
+        id: 'franchise-attack-on-titan',
+        title: 'Attack on Titan (Shingeki no Kyojin)',
+        searchQuery: 'Shingeki no Kyojin',
+        coverUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Azione', 'Drammatico', 'Mistero', 'Fantasy'],
+        arcs: [
+          { id: 7442, name: 'Stagione 1', eps: 25, year: 2013, status: 'Concluso' },
+          { id: 11470, name: 'Stagione 2', eps: 12, year: 2017, status: 'Concluso' },
+          { id: 13569, name: 'Stagione 3 Parte 1', eps: 12, year: 2018, status: 'Concluso' },
+          { id: 41818, name: 'Stagione 3 Parte 2', eps: 10, year: 2019, status: 'Concluso' },
+          { id: 43806, name: 'The Final Season (Part 1, 2, 3)', eps: 28, year: 2020, status: 'Concluso' }
+        ]
+      },
+      {
+        id: 'franchise-jujutsu-kaisen',
+        title: 'Jujutsu Kaisen',
+        searchQuery: 'Jujutsu Kaisen',
+        coverUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Azione', 'Fantasy', 'Soprannaturale', 'Scuola'],
+        arcs: [
+          { id: 42210, name: 'Stagione 1', eps: 24, year: 2020, status: 'Concluso' },
+          { id: 44023, name: 'Jujutsu Kaisen 0 (Film)', eps: 1, year: 2021, status: 'Concluso' },
+          { id: 45242, name: 'Stagione 2 (Invetro & Incidente di Shibuya)', eps: 23, year: 2023, status: 'Concluso' }
+        ]
+      },
+      {
+        id: 'franchise-my-hero-academia',
+        title: 'My Hero Academia (Boku no Hero)',
+        searchQuery: 'Boku no Hero Academia',
+        coverUrl: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1200&q=80',
+        genres: ['Azione', 'Supereroi', 'Scuola', 'Shounen'],
+        arcs: [
+          { id: 11469, name: 'Stagione 1', eps: 13, year: 2016, status: 'Concluso' },
+          { id: 12268, name: 'Stagione 2', eps: 25, year: 2017, status: 'Concluso' },
+          { id: 13781, name: 'Stagione 3', eps: 25, year: 2018, status: 'Concluso' },
+          { id: 41982, name: 'Stagione 4', eps: 25, year: 2019, status: 'Concluso' },
+          { id: 43176, name: 'Stagione 5', eps: 25, year: 2021, status: 'Concluso' },
+          { id: 45041, name: 'Stagione 6', eps: 25, year: 2022, status: 'Concluso' },
+          { id: 47123, name: 'Stagione 7 (In onda)', eps: 21, year: 2024, status: 'In corso' }
+        ]
       }
-      renderNotifications();
-      initNetflixHome();
-    }
+    ];
 
-    function openAuthModal() {
-      document.getElementById('dropdown-menu').classList.add('hidden');
-      document.getElementById('auth-error').classList.add('hidden');
-      document.getElementById('auth-modal').classList.remove('hidden');
-    }
-    function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
+    document.addEventListener('DOMContentLoaded', () => {
+      initAuth();
+      setupEventListeners();
+      loadInitialCatalogs();
+    });
 
-    function handleRegister() {
-      const user = document.getElementById('auth-username').value.trim();
-      const pass = document.getElementById('auth-password').value.trim();
-      if (!user || !pass) return showAuthError("Inserisci Username e Password.");
-      if (usersDb[user]) return showAuthError("Username già esistente.");
+    function initAuth() {
+      // Setup default demo user if empty
+      const users = JSON.parse(localStorage.getItem('binge_users') || '[]');
+      if (users.length === 0) {
+        users.push({ username: 'demo', password: 'demo123', email: 'demo@binge.tv' });
+        localStorage.setItem('binge_users', JSON.stringify(users));
+      }
+
+      const activeUser = localStorage.getItem('binge_current_user') || 'demo';
+      APP_STATE.currentUser = activeUser;
       
-      usersDb[user] = { password: pass };
-      localStorage.setItem('binge_users_db', JSON.stringify(usersDb));
-      performLogin(user);
-      showToast("Account creato con successo!", "success");
+      // Load user storage data
+      loadUserData(activeUser);
+      updateUserUI();
     }
 
-    function handleLogin() {
-      const user = document.getElementById('auth-username').value.trim();
-      const pass = document.getElementById('auth-password').value.trim();
-      if (usersDb[user] && usersDb[user].password === pass) {
-        performLogin(user);
-        showToast(`Bentornato, ${user}!`, "success");
-      } else {
-        showAuthError("Credenziali non valide.");
-      }
-    }
-
-    function performLogin(user) {
-      currentUser = user;
-      localStorage.setItem('binge_current_user', currentUser);
-      closeAuthModal();
-      initUserSession();
-    }
-
-    function logout() {
-      currentUser = null;
-      localStorage.removeItem('binge_current_user');
-      toggleMenu();
-      goHome();
-      initUserSession();
-      showToast("Logout effettuato.", "info");
-    }
-
-    function showAuthError(msg) {
-      const errEl = document.getElementById('auth-error');
-      errEl.innerText = msg;
-      errEl.classList.remove('hidden');
-    }
-
-    /* --- CENTRO NOTIFICHE --- */
-    function toggleNotifications() {
-      const drawer = document.getElementById('notif-drawer');
-      drawer.classList.toggle('hidden');
-    }
-
-    function addNotification(animeTitle, message, type = 'info', animeId = null) {
-      if (!currentUser) return;
-      const notif = {
-        id: Date.now(),
-        animeTitle,
-        message,
-        type,
-        animeId,
-        date: new Date().toLocaleDateString('it-IT') + ' ' + new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'}),
-        unread: true
-      };
-      userNotifications.unshift(notif);
-      localStorage.setItem(`binge_notifs_${currentUser}`, JSON.stringify(userNotifications));
-      renderNotifications();
-    }
-
-    function renderNotifications() {
-      const countBadge = document.getElementById('notif-count');
-      const container = document.getElementById('notif-list-container');
+    function loadUserData(username) {
+      APP_STATE.favs = JSON.parse(localStorage.getItem(`binge_favs_${username}`) || '[]');
+      APP_STATE.notifications = JSON.parse(localStorage.getItem(`binge_notes_${username}`) || '[]');
+      APP_STATE.watchHistory = JSON.parse(localStorage.getItem(`binge_history_${username}`) || '{}');
       
-      const unreadCount = userNotifications.filter(n => n.unread).length;
-      if (unreadCount > 0) {
-        countBadge.innerText = unreadCount;
-        countBadge.classList.remove('hidden');
-      } else {
-        countBadge.classList.add('hidden');
-      }
-
-      if (userNotifications.length === 0) {
-        container.innerHTML = '<div class="text-center text-xs text-slate-500 py-8">Nessuna notifica presente.</div>';
-        return;
-      }
-
-      container.innerHTML = '';
-      userNotifications.forEach(n => {
-        const item = document.createElement('div');
-        item.className = `p-3 rounded-xl text-xs cursor-pointer border transition ${n.unread ? 'bg-sky-500/10 border-sky-500/30' : 'bg-slate-800/50 border-slate-700/40 hover:bg-slate-800'}`;
-        item.onclick = () => {
-          n.unread = false;
-          localStorage.setItem(`binge_notifs_${currentUser}`, JSON.stringify(userNotifications));
-          renderNotifications();
-          if (n.animeId) openDetails(n.animeId);
-        };
-        item.innerHTML = `
-          <div class="font-bold text-white mb-0.5">${escapeHtml(n.animeTitle)}</div>
-          <div class="text-slate-300">${escapeHtml(n.message)}</div>
-          <div class="text-[10px] text-slate-500 mt-1">${n.date}</div>
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    function clearAllNotifications() {
-      if (!currentUser) return;
-      userNotifications = [];
-      localStorage.setItem(`binge_notifs_${currentUser}`, JSON.stringify(userNotifications));
-      renderNotifications();
-      showToast("Tutte le notifiche sono state cancellate.", "info");
-    }
-
-    async function checkFavoritesUpdates() {
-      if (!currentUser || savedList.length === 0) return;
-
-      for (let anime of savedList) {
-        try {
-          const res = await fetch(`https://kitsu.io/api/edge/anime/${anime.id}`);
-          if (!res.ok) continue;
-          const data = await res.json();
-          if (!data.data) continue;
-          
-          const newStatus = data.data.attributes.status;
-          const oldStatus = anime.status;
-
-          if (oldStatus && oldStatus !== newStatus) {
-            anime.status = newStatus;
-            let msg = "";
-            if (newStatus === 'current') msg = "🚀 Nuova Stagione in onda!";
-            else if (newStatus === 'finished') msg = "🏁 La Stagione si è conclusa!";
-            else if (newStatus === 'upcoming') msg = "📢 Nuova Stagione confermata!";
-            
-            if (msg) addNotification(anime.title, msg, 'status_change', anime.id);
+      // Auto seed sample notifications if empty
+      if (APP_STATE.notifications.length === 0) {
+        APP_STATE.notifications = [
+          {
+            id: 'n_demo_1',
+            franchiseTitle: 'Demon Slayer: Kimetsu no Yaiba',
+            type: '🚀 Uscita Nuova Stagione',
+            message: 'Nuovo arco narrativo disponibile per Demon Slayer!',
+            timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
+            read: false
+          },
+          {
+            id: 'n_demo_2',
+            franchiseTitle: 'Jujutsu Kaisen',
+            type: '📢 Conferma Nuova Stagione',
+            message: 'Annunciata la produzione del Culling Game Arc!',
+            timestamp: new Date(Date.now() - 3600000 * 24).toISOString(),
+            read: true
           }
-        } catch(e) {}
+        ];
+        saveUserData();
       }
-      localStorage.setItem(`binge_saved_${currentUser}`, JSON.stringify(savedList));
+
+      updateNotificationBadge();
+      updateFavBadge();
     }
 
-    function simulateNotification() {
-      const anime = currentAnimeData.find(a => a.id.toString() === selectedAnimeId.toString());
-      if (!anime) return;
-      const types = [
-        "🚀 È iniziata una nuova stagione in streaming!",
-        "🏁 Si è appena conclusa la stagione corrente!",
-        "📢 Annunciato ufficialmente il seguito della serie!"
-      ];
-      const randomMsg = types[Math.floor(Math.random() * types.length)];
-      addNotification(anime.title, randomMsg, 'simulated', anime.id);
-      showToast("🔔 Notifica di prova inviata con successo!", "success");
+    function saveUserData() {
+      if (!APP_STATE.currentUser) return;
+      localStorage.setItem(`binge_favs_${APP_STATE.currentUser}`, JSON.stringify(APP_STATE.favs));
+      localStorage.setItem(`binge_notes_${APP_STATE.currentUser}`, JSON.stringify(APP_STATE.notifications));
+      localStorage.setItem(`binge_history_${APP_STATE.currentUser}`, JSON.stringify(APP_STATE.watchHistory));
+      
+      updateNotificationBadge();
+      updateFavBadge();
     }
 
-    /* --- CARICAMENTO ANIME E COMPONENTI VISIVI --- */
-    function getAnimeBadge(status) {
-      const st = (status || '').toLowerCase();
-      if (st.includes('current') || st.includes('airing')) {
-        return { bgClass: 'bg-emerald-600', label: 'IN CORSO' };
-      }
-      if (st.includes('upcoming') || st.includes('unreleased')) {
-        return { bgClass: 'bg-purple-600', label: 'IN ARRIVO' };
-      }
-      return { bgClass: 'bg-sky-600', label: 'COMPLETO' };
+    function updateUserUI() {
+      const nameEl = document.getElementById('userNameText');
+      const dropNameEl = document.getElementById('dropdownUsername');
+      const dropEmailEl = document.getElementById('dropdownEmail');
+
+      if (nameEl) nameEl.textContent = APP_STATE.currentUser;
+      if (dropNameEl) dropNameEl.textContent = APP_STATE.currentUser;
+      if (dropEmailEl) dropEmailEl.textContent = `${APP_STATE.currentUser.toLowerCase()}@binge.tv`;
     }
 
-    async function fetchKitsuCategory(queryUrl, elementId) {
-      try {
-        const res = await fetch(queryUrl);
-        const data = await res.json();
-        const items = data.data || [];
-        const container = document.getElementById(elementId);
-        if (!container) return;
-        container.innerHTML = '';
+    function setupEventListeners() {
+      // Brand Logo Click -> Reset to Home
+      document.getElementById('brandLogo').addEventListener('click', (e) => {
+        e.preventDefault();
+        showView('viewHome');
+      });
 
-        if (items.length === 0) {
-          container.innerHTML = '<div class="text-slate-500 text-xs p-4">Nessun titolo trovato.</div>';
+      // Header Navigation Buttons
+      document.getElementById('navHomeBtn').addEventListener('click', () => showView('viewHome'));
+      document.getElementById('navPopularBtn').addEventListener('click', () => {
+        showView('viewHome');
+        document.getElementById('popularGrid').scrollIntoView({ behavior: 'smooth' });
+      });
+      document.getElementById('navFavsBtn').addEventListener('click', () => {
+        renderFavsView();
+        showView('viewFavs');
+      });
+
+      // User Profile Menu Toggle
+      const userProfileBtn = document.getElementById('userProfileBtn');
+      const userDropdown = document.getElementById('userDropdown');
+      userProfileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!document.getElementById('userMenuContainer').contains(e.target)) {
+          userDropdown.classList.add('hidden');
+        }
+      });
+
+      // Logout
+      document.getElementById('btnLogout').addEventListener('click', () => {
+        showToast('Disconnesso con successo.', 'info');
+        APP_STATE.currentUser = 'demo';
+        localStorage.setItem('binge_current_user', 'demo');
+        loadUserData('demo');
+        updateUserUI();
+        userDropdown.classList.add('hidden');
+      });
+
+      // Notification Drawer Toggle
+      const notifBellBtn = document.getElementById('notifBellBtn');
+      const notifDrawerOverlay = document.getElementById('notifDrawerOverlay');
+      const notifDrawer = document.getElementById('notifDrawer');
+      const closeNotifDrawerBtn = document.getElementById('closeNotifDrawerBtn');
+
+      function openDrawer() {
+        renderNotificationList();
+        notifDrawerOverlay.classList.remove('hidden');
+        notifDrawer.classList.remove('translate-x-full');
+      }
+
+      function closeDrawer() {
+        notifDrawer.classList.add('translate-x-full');
+        setTimeout(() => notifDrawerOverlay.classList.add('hidden'), 300);
+      }
+
+      notifBellBtn.addEventListener('click', openDrawer);
+      closeNotifDrawerBtn.addEventListener('click', closeDrawer);
+      notifDrawerOverlay.addEventListener('click', closeDrawer);
+
+      // Drawer Actions
+      document.getElementById('btnMarkAllRead').addEventListener('click', () => {
+        APP_STATE.notifications.forEach(n => n.read = true);
+        saveUserData();
+        renderNotificationList();
+        showToast('Tutte le notifiche segnate come lette.', 'success');
+      });
+
+      document.getElementById('btnClearNotifs').addEventListener('click', () => {
+        APP_STATE.notifications = [];
+        saveUserData();
+        renderNotificationList();
+        showToast('Centro notifiche svuotato.', 'info');
+      });
+
+      // Search Inputs (Debounced API query)
+      let searchTimeout = null;
+      const handleSearch = (query) => {
+        if (!query || query.trim().length < 2) {
+          showView('viewHome');
           return;
         }
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => performSearch(query.trim()), 400);
+      };
 
-        items.forEach((item) => {
-          const epCount = item.attributes.episodeCount ? `${item.attributes.episodeCount} Ep.` : 'In corso';
-          const anime = {
-            id: item.id.toString(),
-            title: item.attributes.canonicalTitle || item.attributes.titles?.en || "Anime",
-            coverImage: item.attributes.posterImage?.small || item.attributes.posterImage?.original || 'https://placehold.co/300x450/1e293b/94a3b8?text=No+Cover',
-            synopsis: item.attributes.synopsis || "Nessuna descrizione disponibile.",
-            episodes: epCount,
-            rawEpisodeCount: item.attributes.episodeCount || 12,
-            status: item.attributes.status || 'finished'
-          };
+      const searchInput = document.getElementById('searchInput');
+      const clearSearchBtn = document.getElementById('clearSearchBtn');
 
-          if(!currentAnimeData.find(a => a.id === anime.id)) {
-            currentAnimeData.push(anime);
-          }
-          
-          const badge = getAnimeBadge(anime.status);
-          const card = document.createElement('div');
-          card.className = "flex-shrink-0 w-36 sm:w-44 group cursor-pointer select-none";
-          card.onclick = () => openDetails(anime.id);
-          card.innerHTML = `
-            <div class="relative rounded-2xl overflow-hidden bg-slate-800 border border-slate-800/80 aspect-[2/3] mb-2 shadow-lg group-hover:shadow-sky-500/10 group-hover:border-slate-700 transition duration-300">
-              <img src="${anime.coverImage}" alt="${escapeHtml(anime.title)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-              <div class="absolute top-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black text-white shadow ${badge.bgClass}">
-                ${badge.label}
-              </div>
-            </div>
-            <div class="font-semibold text-xs text-slate-200 line-clamp-1 group-hover:text-sky-400 transition">
-              ${escapeHtml(anime.title)}
-            </div>
-          `;
-          container.appendChild(card);
+      searchInput.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (val.length > 0) clearSearchBtn.classList.remove('hidden');
+        else clearSearchBtn.classList.add('hidden');
+        handleSearch(val);
+      });
+
+      clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearSearchBtn.classList.add('hidden');
+        showView('viewHome');
+      });
+
+      // Mobile Search Toggle
+      document.getElementById('mobileSearchToggleBtn').addEventListener('click', () => {
+        const row = document.getElementById('mobileSearchRow');
+        row.classList.toggle('hidden');
+      });
+
+      document.getElementById('mobileSearchInput').addEventListener('input', (e) => {
+        handleSearch(e.target.value);
+      });
+
+      // Export / Import JSON Favorites
+      document.getElementById('btnExportFavs').addEventListener('click', exportFavsJSON);
+      document.getElementById('btnFavExport2').addEventListener('click', exportFavsJSON);
+      document.getElementById('importJsonInput').addEventListener('change', importFavsJSON);
+
+      // Back to catalog button in detail view
+      document.getElementById('btnBackToCatalog').addEventListener('click', () => showView('viewHome'));
+
+      // Detail view actions
+      document.getElementById('detailFavToggleBtn').addEventListener('click', toggleCurrentDetailFav);
+      document.getElementById('detailTestNotifBtn').addEventListener('click', triggerSimulatedNotification);
+      document.getElementById('btnMarkAllEpsWatched').addEventListener('click', markAllCurrentEpsWatched);
+
+      // Genre pills filter
+      document.querySelectorAll('.genre-pill').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.genre-pill').forEach(b => {
+            b.classList.remove('bg-binge-accent', 'text-slate-950');
+            b.classList.add('bg-slate-800', 'text-slate-300');
+          });
+          e.target.classList.remove('bg-slate-800', 'text-slate-300');
+          e.target.classList.add('bg-binge-accent', 'text-slate-950');
+
+          const genre = e.target.getAttribute('data-genre');
+          filterCatalogByGenre(genre);
         });
-      } catch (err) { console.error("Errore Kitsu:", err); }
+      });
     }
 
-    function renderFavoritesRow() {
-      const container = document.getElementById('row-favorites');
+    async function loadInitialCatalogs() {
+      // 1. Render Known Grouped Franchises first
+      renderCatalogGrid('popularGrid', KNOWN_FRANCHISES);
+      
+      // Setup Hero banner with first popular franchise
+      if (KNOWN_FRANCHISES.length > 0) {
+        setupHeroBanner(KNOWN_FRANCHISES[0]);
+      }
+
+      // 2. Fetch Top Rated & Airing from Kitsu API and aggregate them dynamically!
+      try {
+        const [topRes, airingRes] = await Promise.all([
+          fetch('https://kitsu.io/api/edge/anime?sort=-averageRating&page[limit]=15'),
+          fetch('https://kitsu.io/api/edge/anime?filter[status]=current&sort=-userCount&page[limit]=15')
+        ]);
+
+        const topData = await topRes.json();
+        const airingData = await airingRes.json();
+
+        APP_STATE.topFranchises = clusterKitsuItemsIntoFranchises(topData.data);
+        APP_STATE.airingFranchises = clusterKitsuItemsIntoFranchises(airingData.data);
+
+        renderCatalogGrid('topGrid', APP_STATE.topFranchises);
+        renderCatalogGrid('airingGrid', APP_STATE.airingFranchises);
+
+      } catch (err) {
+        console.warn('Fallback to pre-grouped catalog due to network speed/error:', err);
+        renderCatalogGrid('topGrid', KNOWN_FRANCHISES);
+        renderCatalogGrid('airingGrid', KNOWN_FRANCHISES);
+      }
+    }
+
+    // Dynamic Franchise Clustering Engine: Deduplicates multiple seasons into 1 single Poster Card
+    function clusterKitsuItemsIntoFranchises(kitsuItems) {
+      if (!kitsuItems || !Array.isArray(kitsuItems)) return [];
+
+      const franchiseMap = new Map();
+
+      kitsuItems.forEach(item => {
+        const canonTitle = item.attributes.canonicalTitle || item.attributes.titles.en || 'Anime';
+        // Extract base title by stripping season suffixes
+        const baseKey = normalizeFranchiseTitle(canonTitle);
+
+        if (!franchiseMap.has(baseKey)) {
+          franchiseMap.set(baseKey, {
+            id: `f-${item.id}`,
+            title: baseKey,
+            coverUrl: item.attributes.posterImage?.large || item.attributes.posterImage?.original,
+            genres: ['Anime', 'Serie'],
+            arcs: []
+          });
+        }
+
+        const obj = franchiseMap.get(baseKey);
+        obj.arcs.push({
+          id: item.id,
+          name: item.attributes.canonicalTitle,
+          eps: item.attributes.episodeCount || 12,
+          year: item.attributes.startDate ? item.attributes.startDate.split('-')[0] : '2022',
+          status: item.attributes.status === 'current' ? 'In corso' : 'Concluso',
+          synopsis: item.attributes.synopsis
+        });
+      });
+
+      return Array.from(franchiseMap.values());
+    }
+
+    function normalizeFranchiseTitle(title) {
+      // Check if matches known title
+      for (const kf of KNOWN_FRANCHISES) {
+        if (title.toLowerCase().includes(kf.searchQuery.toLowerCase()) || title.toLowerCase().includes(kf.title.toLowerCase())) {
+          return kf.title;
+        }
+      }
+      // General Regex normalizer
+      return title
+        .replace(/(Season|2nd Season|3rd Season|4th Season|The Final Season|Part \d+|Cour \d+|Movie|OVA|TV).*/gi, '')
+        .trim();
+    }
+
+    function renderCatalogGrid(gridId, franchises) {
+      const container = document.getElementById(gridId);
+      if (!container) return;
       container.innerHTML = '';
-      if (!currentUser) {
-        container.innerHTML = '<div onclick="openAuthModal()" class="text-slate-400 text-xs p-4 bg-slate-900/60 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700">🔒 Accedi per sincronizzare i tuoi preferiti.</div>';
-        return;
-      }
-      if (savedList.length === 0) {
-        container.innerHTML = '<div class="text-slate-500 text-xs p-4">Nessun anime salvato nei preferiti.</div>';
-        return;
-      }
-      savedList.forEach(anime => {
-        if(!currentAnimeData.find(a => a.id === anime.id)) currentAnimeData.push(anime);
-        const badge = getAnimeBadge(anime.status);
+
+      franchises.forEach(f => {
         const card = document.createElement('div');
-        card.className = "flex-shrink-0 w-36 sm:w-44 group cursor-pointer select-none";
-        card.onclick = () => openDetails(anime.id);
+        card.className = 'glass-card rounded-2xl overflow-hidden hover:border-binge-accent/50 transition-all duration-300 hover:-translate-y-1.5 shadow-lg group cursor-pointer flex flex-col';
+        
+        const isFav = APP_STATE.favs.some(fav => fav.title === f.title || fav.id === f.id);
+        const arcCount = f.arcs ? f.arcs.length : 1;
+
         card.innerHTML = `
-          <div class="relative rounded-2xl overflow-hidden bg-slate-800 border border-slate-800/80 aspect-[2/3] mb-2 shadow-lg group-hover:shadow-sky-500/10 group-hover:border-slate-700 transition duration-300">
-            <img src="${anime.coverImage}" alt="${escapeHtml(anime.title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-            <div class="absolute top-2 right-2 px-2 py-0.5 rounded-md text-[9px] font-black text-white shadow ${badge.bgClass}">
-              ${badge.label}
+          <div class="relative aspect-[2/3] overflow-hidden bg-slate-800">
+            <img src="${f.coverUrl}" alt="${f.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
+            
+            <button class="card-fav-btn absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-xs transition-transform hover:scale-110 z-10 ${isFav ? 'text-rose-500' : 'text-slate-400 hover:text-white'}" title="Aggiungi ai preferiti">
+              <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+            </button>
+
+            <span class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur-md text-[11px] font-bold text-binge-accent border border-slate-700/60">
+              <i class="fa-solid fa-layer-group text-[10px] mr-1"></i> ${arcCount} ${arcCount > 1 ? 'Stagioni/Archi' : 'Stagione'}
+            </span>
+          </div>
+
+          <div class="p-3.5 flex-1 flex flex-col justify-between space-y-2">
+            <h3 class="font-bold text-sm text-slate-100 group-hover:text-binge-accent transition-colors line-clamp-2">
+              ${f.title}
+            </h3>
+            <div class="flex items-center justify-between text-[11px] text-slate-400">
+              <span>${f.genres ? f.genres[0] : 'Anime'}</span>
+              <span class="text-amber-400 font-semibold"><i class="fa-solid fa-star text-[10px] mr-0.5"></i> 8.7</span>
             </div>
           </div>
-          <div class="font-semibold text-xs text-slate-200 line-clamp-1 group-hover:text-sky-400 transition">
-            ${escapeHtml(anime.title)}
-          </div>
         `;
+
+        // Card Click -> Open Detail
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.card-fav-btn')) {
+            e.stopPropagation();
+            toggleFavoriteFranchise(f);
+            renderCatalogGrid(gridId, franchises);
+            return;
+          }
+          openFranchiseDetail(f);
+        });
+
         container.appendChild(card);
       });
     }
 
-    function initNetflixHome() {
-      currentAnimeData = [];
-      renderFavoritesRow();
-      
-      // Nuove Uscite
-      fetchKitsuCategory('https://kitsu.io/api/edge/anime?filter[status]=current&sort=-startDate&page[limit]=15', 'row-new-releases');
-      
-      if (savedList.length > 0) {
-        const keyword = encodeURIComponent(savedList[savedList.length - 1].title.split(' ')[0]);
-        fetchKitsuCategory(`https://kitsu.io/api/edge/anime?filter[text]=${keyword}&page[limit]=10`, 'row-ai-recommendations');
-      } else {
-        fetchKitsuCategory('https://kitsu.io/api/edge/anime?page[limit]=10&sort=-average_rating', 'row-ai-recommendations');
-      }
-      fetchKitsuCategory('https://kitsu.io/api/edge/anime?page[limit]=15&sort=popularityRank', 'row-top-ita');
+    function setupHeroBanner(franchise) {
+      document.getElementById('heroBgImage').style.backgroundImage = `url('${franchise.coverUrl}')`;
+      document.getElementById('heroTitle').textContent = franchise.title;
+      document.getElementById('heroArcBadge').textContent = `${franchise.arcs.length} Stagioni & Archi Unificati`;
+
+      document.getElementById('heroOpenBtn').onclick = () => openFranchiseDetail(franchise);
+      document.getElementById('heroFavBtn').onclick = () => toggleFavoriteFranchise(franchise);
     }
 
-    /* --- RICERCA E FILTRI --- */
-    function handleSearch() {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        const query = document.getElementById('search-input').value.trim();
-        document.getElementById('year-select').value = '';
-        const searchSection = document.getElementById('searchResultsSection');
-        const mainRows = document.getElementById('mainRows');
-        if (!query) { 
-          searchSection.classList.add('hidden'); 
-          mainRows.classList.remove('hidden'); 
-          return; 
-        }
-        
-        searchSection.classList.remove('hidden'); 
-        mainRows.classList.add('hidden');
-        document.getElementById('search-title').innerText = `🔎 Risultati: "${query}"`;
-        fetchKitsuCategory(`https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(query)}&page[limit]=24`, 'search-grid');
-      }, 400);
-    }
-
-    function filterByYear() {
-      const year = document.getElementById('year-select').value;
-      if (!year) { 
-        document.getElementById('searchResultsSection').classList.add('hidden'); 
-        document.getElementById('mainRows').classList.remove('hidden'); 
-        return; 
-      }
-      document.getElementById('searchResultsSection').classList.remove('hidden'); 
-      document.getElementById('mainRows').classList.add('hidden');
-      document.getElementById('search-title').innerText = `📅 Annata (${year})`;
-      fetchKitsuCategory(`https://kitsu.io/api/edge/anime?filter[seasonYear]=${year}&page[limit]=24&sort=-user_count`, 'search-grid');
-    }
-
-    function resetSearch() {
-      document.getElementById('search-input').value = '';
-      document.getElementById('year-select').value = '';
-      document.getElementById('searchResultsSection').classList.add('hidden');
-      document.getElementById('mainRows').classList.remove('hidden');
-    }
-
-    /* ==========================================================================
-       CARICAMENTO E RENDERING DETTAGLIO ANIME CON RECUPERO EPISODI RESILIENTE
-       ========================================================================== */
-    async function openDetails(id) {
-      let anime = currentAnimeData.find(a => a.id.toString() === id.toString());
-
-      // Se l'anime non è in memoria, scarichiamo la scheda da Kitsu
-      if (!anime) {
-        try {
-          const res = await fetch(`https://kitsu.io/api/edge/anime/${id}`);
-          if (res.ok) {
-            const data = await res.json();
-            const item = data.data;
-            if (item) {
-              anime = {
-                id: item.id.toString(),
-                title: item.attributes.canonicalTitle || item.attributes.titles?.en || "Anime",
-                coverImage: item.attributes.posterImage?.large || item.attributes.posterImage?.original || item.attributes.posterImage?.small,
-                synopsis: item.attributes.synopsis || "Nessuna descrizione disponibile per questo titolo.",
-                episodes: item.attributes.episodeCount ? `${item.attributes.episodeCount} Ep.` : 'In corso',
-                rawEpisodeCount: item.attributes.episodeCount || 12,
-                status: item.attributes.status || 'finished'
-              };
-              currentAnimeData.push(anime);
-            }
-          }
-        } catch (err) {
-          showToast("Impossibile recuperare le informazioni dell'anime.", "error");
-          return;
-        }
-      }
-
-      if (!anime) {
-        showToast("Anime non trovato.", "error");
+    function filterCatalogByGenre(genre) {
+      if (genre === 'all') {
+        renderCatalogGrid('popularGrid', KNOWN_FRANCHISES);
         return;
       }
-
-      selectedAnimeId = anime.id;
-      document.getElementById('detail-title').innerText = anime.title;
-      document.getElementById('detail-poster').src = anime.coverImage;
-      document.getElementById('detail-episodes').innerText = `📺 ${anime.episodes}`;
-
-      const statusBadge = getAnimeBadge(anime.status);
-      const statusEl = document.getElementById('detail-status');
-      statusEl.className = `absolute top-3 right-3 px-3 py-1 rounded-full text-[10px] font-black text-white shadow-lg uppercase backdrop-blur-md ${statusBadge.bgClass}`;
-      statusEl.innerText = statusBadge.label;
-
-      document.getElementById('detail-description').innerText = anime.synopsis;
-
-      updateSaveButtonState();
-      showDetailsPage();
-      loadKitsuGenres(anime.id);
-      loadKitsuEpisodes(anime.id, anime.rawEpisodeCount || (parseInt(anime.episodes, 10) || 12));
+      const filtered = KNOWN_FRANCHISES.filter(f => f.genres.some(g => g.toLowerCase().includes(genre.toLowerCase())));
+      renderCatalogGrid('popularGrid', filtered);
     }
 
-    async function loadKitsuGenres(id) {
-      const container = document.getElementById('detail-genres');
-      container.innerHTML = '';
+    async function performSearch(query) {
+      showView('viewSearch');
+      const grid = document.getElementById('searchGrid');
+      const emptyState = document.getElementById('searchEmptyState');
+      grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400 text-sm"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-binge-accent"></i><p>Ricerca e unificazione franchising in corso...</p></div>';
+
       try {
-        const res = await fetch(`https://kitsu.io/api/edge/anime/${id}/categories`);
+        const res = await fetch(`https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(query)}&page[limit]=20`);
         const data = await res.json();
-        if (data.data) {
-          data.data.slice(0, 6).forEach(c => {
-            const tag = document.createElement('span'); 
-            tag.className = 'bg-slate-800 text-slate-300 text-xs px-3 py-1 rounded-full border border-slate-700/60 font-medium'; 
-            tag.innerText = c.attributes.title; 
-            container.appendChild(tag);
-          });
+
+        if (!data.data || data.data.length === 0) {
+          grid.innerHTML = '';
+          emptyState.classList.remove('hidden');
+          return;
         }
-      } catch (e) {}
+
+        emptyState.classList.add('hidden');
+        const searchFranchises = clusterKitsuItemsIntoFranchises(data.data);
+        renderCatalogGrid('searchGrid', searchFranchises);
+
+      } catch (err) {
+        console.error('Search error:', err);
+        grid.innerHTML = '<div class="col-span-full py-12 text-center text-rose-400 text-sm">Errore durante la ricerca. Riprova tra poco.</div>';
+      }
     }
 
-    /* --- SISTEMA A 3 LIVELLI PER IL CARICAMENTO EPISODI (RESILIENTE) --- */
-    async function loadKitsuEpisodes(id, episodeCount) {
-      const container = document.getElementById('detail-episodes-list');
-      container.innerHTML = `
-        <div class="flex items-center justify-center p-8 text-sky-400 font-medium gap-3">
-          <svg class="animate-spin h-5 w-5 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span class="text-xs">Caricamento puntate in corso...</span>
-        </div>`;
+    async function openFranchiseDetail(franchise) {
+      APP_STATE.currentDetailFranchise = franchise;
+      APP_STATE.activeArcIndex = 0;
+
+      showView('viewDetail');
+
+      // Populate Left Column
+      document.getElementById('detailPoster').src = franchise.coverUrl;
+      document.getElementById('detailFranchiseTitle').textContent = franchise.title;
+
+      // Render Genre Tags
+      const genresContainer = document.getElementById('detailGenres');
+      genresContainer.innerHTML = (franchise.genres || ['Azione', 'Soprannaturale']).map(g => 
+        `<span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-700">${g}</span>`
+      ).join('');
+
+      // Check if we need to fetch deeper media-relationships from Kitsu API
+      if (!franchise.arcs || franchise.arcs.length === 0) {
+        franchise.arcs = [
+          { id: franchise.id || 1, name: 'Stagione 1 (Principale)', eps: 12, year: 2022, status: 'Concluso' }
+        ];
+      }
+
+      // Render Season/Arc Selector Pills
+      renderSeasonTabs();
+      
+      // Load active season details & episodes
+      loadActiveArcDetails();
+      updateDetailFavBtnUI();
+    }
+
+    // REQUIREMENT 1: Dynamic Season/Arc Switcher within the same unified detail view
+    function renderSeasonTabs() {
+      const container = document.getElementById('seasonTabsContainer');
+      const countLabel = document.getElementById('seasonCountLabel');
+      const franchise = APP_STATE.currentDetailFranchise;
+
+      countLabel.textContent = `${franchise.arcs.length} Elementi Collegati`;
+      container.innerHTML = '';
+
+      franchise.arcs.forEach((arc, idx) => {
+        const btn = document.createElement('button');
+        const isActive = idx === APP_STATE.activeArcIndex;
+
+        btn.className = `px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 border ${
+          isActive 
+            ? 'bg-binge-accent text-slate-950 border-binge-accent shadow-md scale-105' 
+            : 'bg-slate-900 text-slate-300 border-slate-700 hover:border-slate-500 hover:text-white'
+        }`;
+
+        btn.innerHTML = `
+          <i class="fa-solid fa-play text-[10px]"></i>
+          <span>${arc.name}</span>
+          <span class="px-1.5 py-0.5 rounded bg-slate-950/30 text-[10px] font-semibold">${arc.eps || '?'} Ep</span>
+        `;
+
+        btn.addEventListener('click', () => {
+          APP_STATE.activeArcIndex = idx;
+          renderSeasonTabs();
+          loadActiveArcDetails();
+        });
+
+        container.appendChild(btn);
+      });
+    }
+
+    async function loadActiveArcDetails() {
+      const franchise = APP_STATE.currentDetailFranchise;
+      const arc = franchise.arcs[APP_STATE.activeArcIndex];
+
+      document.getElementById('activeArcTitle').textContent = arc.name;
+      document.getElementById('activeArcYear').innerHTML = `<i class="fa-regular fa-calendar mr-1"></i> ${arc.year || '2023'}`;
+      document.getElementById('activeArcEps').innerHTML = `<i class="fa-solid fa-tv mr-1"></i> ${arc.eps || 12} Episodi`;
+      document.getElementById('activeArcSynopsis').textContent = arc.synopsis || `Panoramica completa per ${arc.name}. Segui gli episodi ufficiali dell'arco narrativo senza perderti nessun aggiornamento.`;
+
+      // Fetch Episodes resiliently
+      const epContainer = document.getElementById('episodesList');
+      epContainer.innerHTML = '<div class="py-8 text-center text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin text-lg text-binge-accent mr-2"></i> Caricamento puntate...</div>';
 
       let episodes = [];
 
-      // 1. Tenta Endpoint Principale Kitsu
       try {
-        const res = await fetch(`https://kitsu.io/api/edge/anime/${id}/episodes?page[limit]=100&sort=number`);
-        if (res.ok) {
+        if (arc.id && typeof arc.id === 'number') {
+          const res = await fetch(`https://kitsu.io/api/edge/anime/${arc.id}/episodes?page[limit]=40`);
           const data = await res.json();
           if (data.data && data.data.length > 0) {
-            episodes = data.data;
+            episodes = data.data.map(e => ({
+              number: e.attributes.number,
+              title: e.attributes.canonicalTitle || `Episodio ${e.attributes.number}`,
+              overview: e.attributes.synopsis || 'Nessuna descrizione dettagliata disponibile per questa puntata.',
+              thumbnail: e.attributes.thumbnail?.original || franchise.coverUrl
+            }));
           }
         }
-      } catch(e) {}
-
-      // 2. Tenta Endpoint Alternativo Kitsu se vuoto
-      if (episodes.length === 0) {
-        try {
-          const res2 = await fetch(`https://kitsu.io/api/edge/episodes?filter[mediaId]=${id}&page[limit]=100&sort=number`);
-          if (res2.ok) {
-            const data2 = await res2.json();
-            if (data2.data && data2.data.length > 0) {
-              episodes = data2.data;
-            }
-          }
-        } catch(e) {}
+      } catch (err) {
+        console.warn('Episode API fetch error, generating resilient fallback episodes:', err);
       }
 
-      // Renderizza episodi reali se trovati nelle API
-      if (episodes.length > 0) {
-        container.innerHTML = '';
-        episodes.forEach(ep => {
-          const num = ep.attributes.number || ep.attributes.relativeNumber || '-';
-          const title = ep.attributes.canonicalTitle || ep.attributes.titles?.en || ep.attributes.titles?.en_jp || `Episodio ${num}`;
-          const airdate = ep.attributes.airdate ? new Date(ep.attributes.airdate).toLocaleDateString('it-IT') : 'Disponibile';
-          const synopsis = ep.attributes.synopsis ? (ep.attributes.synopsis.substring(0, 110) + '...') : '';
+      // REQUIREMENT 5: Resilient Fallback Episode Generator
+      if (episodes.length === 0) {
+        const total = arc.eps || 12;
+        for (let i = 1; i <= total; i++) {
+          episodes.push({
+            number: i,
+            title: `Episodio ${i} - ${arc.name}`,
+            overview: `Puntata numero ${i} della stagione/arco ${arc.name}. Clicca sul pulsante a destra per contrassegnare come visto.`,
+            thumbnail: franchise.coverUrl
+          });
+        }
+      }
 
-          const card = document.createElement('div');
-          card.className = "bg-slate-900/80 hover:bg-slate-800 p-3.5 rounded-xl border border-slate-800 transition flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-md";
-          card.innerHTML = `
-            <div class="flex items-start gap-3">
-              <span class="flex-shrink-0 min-w-8 h-8 rounded-lg bg-sky-500/10 text-sky-400 font-bold flex items-center justify-center text-xs border border-sky-500/20 px-2">
-                ${num}
+      renderEpisodeCards(episodes, arc.id || arc.name);
+    }
+
+    function renderEpisodeCards(episodes, arcKey) {
+      const epContainer = document.getElementById('episodesList');
+      epContainer.innerHTML = '';
+
+      let watchedCount = 0;
+
+      episodes.forEach(ep => {
+        const historyKey = `${arcKey}_ep_${ep.number}`;
+        const isWatched = !!APP_STATE.watchHistory[historyKey];
+        if (isWatched) watchedCount++;
+
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+          isWatched 
+            ? 'bg-slate-900/60 border-slate-800 opacity-75' 
+            : 'bg-slate-800/70 border-slate-700/60 hover:border-slate-600'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3.5 flex-1 min-w-0">
+            <div class="relative w-20 h-14 rounded-xl overflow-hidden bg-slate-900 flex-shrink-0 border border-slate-700/60">
+              <img src="${ep.thumbnail}" alt="Ep" class="w-full h-full object-cover">
+              <span class="absolute inset-0 bg-slate-950/30 flex items-center justify-center font-bold text-xs text-white">
+                #${ep.number}
               </span>
-              <div>
-                <div class="font-semibold text-xs sm:text-sm text-slate-100">${escapeHtml(title)}</div>
-                ${synopsis ? `<p class="text-[11px] text-slate-400 mt-0.5 leading-snug">${escapeHtml(synopsis)}</p>` : ''}
-              </div>
             </div>
-            <div class="text-[11px] text-slate-400 whitespace-nowrap self-end md:self-center flex items-center gap-1 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
-              <span>📅 ${airdate}</span>
+            <div class="min-w-0 flex-1">
+              <h4 class="font-bold text-sm text-slate-100 truncate ${isWatched ? 'line-through text-slate-400' : ''}">${ep.title}</h4>
+              <p class="text-xs text-slate-400 line-clamp-1 mt-0.5">${ep.overview}</p>
             </div>
-          `;
-          container.appendChild(card);
+          </div>
+
+          <button class="toggle-ep-btn px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 self-end sm:self-center ${
+            isWatched 
+              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+              : 'bg-slate-700/80 hover:bg-slate-600 text-slate-200 border border-slate-600'
+          }">
+            <i class="fa-solid ${isWatched ? 'fa-check' : 'fa-eye'}"></i>
+            <span>${isWatched ? 'Visto' : 'Segna Visto'}</span>
+          </button>
+        `;
+
+        card.querySelector('.toggle-ep-btn').addEventListener('click', () => {
+          APP_STATE.watchHistory[historyKey] = !APP_STATE.watchHistory[historyKey];
+          saveUserData();
+          renderEpisodeCards(episodes, arcKey);
         });
+
+        epContainer.appendChild(card);
+      });
+
+      // Update Watch Progress Bar
+      const total = episodes.length;
+      const pct = Math.round((watchedCount / total) * 100);
+      document.getElementById('arcProgressText').textContent = `${watchedCount} / ${total} Episodi (${pct}%)`;
+      document.getElementById('arcProgressBar').style.width = `${pct}%`;
+    }
+
+    function markAllCurrentEpsWatched() {
+      const franchise = APP_STATE.currentDetailFranchise;
+      if (!franchise) return;
+      const arc = franchise.arcs[APP_STATE.activeArcIndex];
+      const total = arc.eps || 12;
+      const arcKey = arc.id || arc.name;
+
+      for (let i = 1; i <= total; i++) {
+        APP_STATE.watchHistory[`${arcKey}_ep_${i}`] = true;
+      }
+      saveUserData();
+      loadActiveArcDetails();
+      showToast(`Tutti gli episodi di ${arc.name} segnati come visti!`, 'success');
+    }
+
+    function toggleFavoriteFranchise(franchise) {
+      const index = APP_STATE.favs.findIndex(f => f.title === franchise.title || f.id === franchise.id);
+      
+      if (index >= 0) {
+        APP_STATE.favs.splice(index, 1);
+        showToast(`Rimosso dai preferiti: ${franchise.title}`, 'info');
+      } else {
+        APP_STATE.favs.push(franchise);
+        showToast(`Aggiunto ai preferiti: ${franchise.title}`, 'success');
+      }
+
+      saveUserData();
+      updateDetailFavBtnUI();
+    }
+
+    function toggleCurrentDetailFav() {
+      if (!APP_STATE.currentDetailFranchise) return;
+      toggleFavoriteFranchise(APP_STATE.currentDetailFranchise);
+    }
+
+    function updateDetailFavBtnUI() {
+      const btn = document.getElementById('detailFavToggleBtn');
+      if (!btn || !APP_STATE.currentDetailFranchise) return;
+
+      const isFav = APP_STATE.favs.some(f => f.title === APP_STATE.currentDetailFranchise.title || f.id === APP_STATE.currentDetailFranchise.id);
+      if (isFav) {
+        btn.className = 'w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 transition-all flex items-center justify-center gap-2 shadow-lg';
+        btn.innerHTML = '<i class="fa-solid fa-heart text-rose-500 text-base"></i> Salvato nei Preferiti';
+      } else {
+        btn.className = 'w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-all flex items-center justify-center gap-2 shadow-lg';
+        btn.innerHTML = '<i class="fa-regular fa-heart text-rose-500 text-base"></i> Salva Franchising nei Preferiti';
+      }
+    }
+
+    function renderFavsView() {
+      const grid = document.getElementById('favsGrid');
+      const emptyState = document.getElementById('favsEmptyState');
+
+      if (APP_STATE.favs.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
         return;
       }
 
-      // 3. GENERAZIONE DINAMICA DI FALLBACK se Kitsu non ha l'indice delle singole puntate
-      const totalEp = parseInt(episodeCount, 10) || 12;
-      container.innerHTML = `
-        <div class="mb-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs flex items-center gap-2">
-          <span>⚠️ Dettagli puntate non indicizzati su Kitsu. Generata la lista delle ${totalEp} puntate previste per la visione.</span>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5" id="fallback-ep-grid"></div>
-      `;
-      const grid = document.getElementById('fallback-ep-grid');
-
-      for (let i = 1; i <= totalEp; i++) {
-        const card = document.createElement('div');
-        card.className = "bg-slate-900/80 p-3 rounded-xl border border-slate-800 flex items-center justify-between";
-        card.innerHTML = `
-          <div class="flex items-center gap-2.5">
-            <span class="w-7 h-7 rounded-lg bg-sky-500/10 text-sky-400 font-bold flex items-center justify-center text-xs border border-sky-500/20">
-              ${i}
-            </span>
-            <span class="font-medium text-slate-200 text-xs">Episodio ${i}</span>
-          </div>
-          <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-semibold">Pronto</span>
-        `;
-        grid.appendChild(card);
-      }
+      emptyState.classList.add('hidden');
+      renderCatalogGrid('favsGrid', APP_STATE.favs);
     }
 
-    /* --- AZIONI PREFERITI ED IMPORT/EXPORT --- */
-    function updateSaveButtonState() {
-      const saveBtn = document.getElementById('save-btn');
-      if (!currentUser) {
-        saveBtn.innerHTML = "<span>🔒 Accedi per Salvare</span>";
-        saveBtn.onclick = () => openAuthModal();
+    function updateFavBadge() {
+      const badge = document.getElementById('favCountBadge');
+      if (!badge) return;
+      const count = APP_STATE.favs.length;
+      if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
       } else {
-        const isSaved = savedList.some(item => item.id.toString() === selectedAnimeId.toString());
-        saveBtn.innerHTML = isSaved ? "<span>❌ Rimuovi dai Preferiti</span>" : "<span>➕ Aggiungi ai Preferiti</span>";
-        saveBtn.onclick = toggleSaveAnime;
+        badge.classList.add('hidden');
       }
     }
 
-    function toggleSaveAnime() {
-      if (!currentUser) return openAuthModal();
-      const anime = currentAnimeData.find(a => a.id.toString() === selectedAnimeId.toString());
-      if (!anime) return;
-
-      const index = savedList.findIndex(item => item.id.toString() === selectedAnimeId.toString());
-      if (index > -1) {
-        savedList.splice(index, 1);
-        showToast("Rimosso dai preferiti.", "info");
-      } else {
-        savedList.push(anime);
-        addNotification(anime.title, "➕ Aggiunto alla lista dei preferiti!", 'favorite_add', anime.id);
-        showToast("Aggiunto ai tuoi preferiti!", "success");
+    // Export JSON
+    function exportFavsJSON() {
+      if (APP_STATE.favs.length === 0) {
+        showToast('Nessun preferito da esportare.', 'warning');
+        return;
       }
-      localStorage.setItem(`binge_saved_${currentUser}`, JSON.stringify(savedList));
-      updateSaveButtonState();
-      renderFavoritesRow();
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(APP_STATE.favs, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `binge_preferiti_${APP_STATE.currentUser}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('File JSON dei preferiti scaricato.', 'success');
     }
 
-    function exportHistory() {
-      if (savedList.length === 0) return showToast("Nessun anime nei preferiti da esportare.", "error");
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedList, null, 2));
-      const a = document.createElement('a'); 
-      a.href = dataStr; 
-      a.download = `preferiti_${currentUser}.json`;
-      document.body.appendChild(a); 
-      a.click(); 
-      a.remove(); 
-      toggleMenu();
-      showToast("Download del backup avviato!", "success");
-    }
-
-    function triggerImport() { 
-      document.getElementById('import-file').click(); 
-      toggleMenu(); 
-    }
-    
-    function importHistory(event) {
-      const file = event.target.files[0]; 
+    // Import JSON
+    function importFavsJSON(e) {
+      const file = e.target.files[0];
       if (!file) return;
+
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function(evt) {
         try {
-          const importedData = JSON.parse(e.target.result);
-          if (Array.isArray(importedData)) {
-            const existingIds = new Set(savedList.map(a => a.id.toString()));
-            const filteredNew = importedData.filter(a => a.id && !existingIds.has(a.id.toString()));
-            savedList = [...savedList, ...filteredNew];
-            localStorage.setItem(`binge_saved_${currentUser}`, JSON.stringify(savedList));
-            showToast(`Importati ${filteredNew.length} nuovi titoli!`, "success");
-            renderFavoritesRow();
+          const imported = JSON.parse(evt.target.result);
+          if (Array.isArray(imported)) {
+            APP_STATE.favs = imported;
+            saveUserData();
+            showToast(`${imported.length} preferiti importati con successo!`, 'success');
+            if (!document.getElementById('viewFavs').classList.contains('hidden')) {
+              renderFavsView();
+            }
           } else {
-            showToast("Formato file non valido.", "error");
+            showToast('Formato JSON non valido.', 'warning');
           }
-        } catch (err) { 
-          showToast("Errore durante la lettura del file.", "error"); 
+        } catch (err) {
+          showToast('Errore durante la lettura del file JSON.', 'warning');
         }
       };
       reader.readAsText(file);
     }
 
-    /* --- AVVIO APPLICAZIONE --- */
-    window.onload = function() {
-      initUserSession();
-    };
+    // REQUIREMENT 3: Simulated Notification Generator
+    function triggerSimulatedNotification() {
+      const franchise = APP_STATE.currentDetailFranchise;
+      if (!franchise) return;
+
+      const notifTypes = [
+        { type: '🚀 Uscita Nuova Stagione', msg: `È uscito un nuovo episodio per l'arco narrativo di ${franchise.title}!` },
+        { type: '🏁 Stagione Finita', msg: `La stagione corrente di ${franchise.title} si è conclusa! Puoi fare il binge-watching completo.` },
+        { type: '📢 Conferma Nuova Stagione', msg: `UFFICIALE: Confermata una nuova stagione / film per ${franchise.title}!` }
+      ];
+
+      const picked = notifTypes[Math.floor(Math.random() * notifTypes.length)];
+
+      const newNotif = {
+        id: `notif_${Date.now()}`,
+        franchiseTitle: franchise.title,
+        type: picked.type,
+        message: picked.msg,
+        timestamp: new Date().toISOString(),
+        read: false,
+        franchiseData: franchise
+      };
+
+      APP_STATE.notifications.unshift(newNotif);
+      saveUserData();
+
+      showToast(`${picked.type}: ${franchise.title}`, 'success');
+    }
+
+    function renderNotificationList() {
+      const container = document.getElementById('notifListContainer');
+      const unreadBadge = document.getElementById('drawerUnreadBadge');
+      
+      const unreadCount = APP_STATE.notifications.filter(n => !n.read).length;
+      unreadBadge.textContent = `${unreadCount} nuove`;
+
+      if (APP_STATE.notifications.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-16 text-slate-500 space-y-2">
+            <i class="fa-regular fa-bell-slash text-3xl"></i>
+            <p class="text-xs">Nessuna notifica presente.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+
+      APP_STATE.notifications.forEach(n => {
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-2xl border transition-all cursor-pointer relative ${
+          !n.read 
+            ? 'bg-slate-800/90 border-binge-accent/40 shadow-md' 
+            : 'bg-slate-900/50 border-slate-800/80 opacity-80'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-xs font-bold text-binge-accent flex items-center gap-1">
+              ${n.type}
+            </span>
+            <span class="text-[10px] text-slate-400">${formatTimeAgo(n.timestamp)}</span>
+          </div>
+
+          <h5 class="font-bold text-sm text-slate-100 mt-1">${n.franchiseTitle}</h5>
+          <p class="text-xs text-slate-300 mt-1 line-clamp-2">${n.message}</p>
+
+          <div class="mt-2 flex items-center justify-between border-t border-slate-800 pt-2 text-[11px]">
+            <span class="text-sky-400 hover:underline font-semibold">Apri scheda anime <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
+            <button class="delete-notif-btn text-slate-500 hover:text-rose-400 p-1">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        `;
+
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.delete-notif-btn')) {
+            e.stopPropagation();
+            APP_STATE.notifications = APP_STATE.notifications.filter(x => x.id !== n.id);
+            saveUserData();
+            renderNotificationList();
+            return;
+          }
+
+          n.read = true;
+          saveUserData();
+          
+          if (n.franchiseData) {
+            openFranchiseDetail(n.franchiseData);
+          } else {
+            // Find in known or popular
+            const found = KNOWN_FRANCHISES.find(f => f.title === n.franchiseTitle);
+            if (found) openFranchiseDetail(found);
+          }
+          
+          document.getElementById('notifDrawerOverlay').click();
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    function updateNotificationBadge() {
+      const badge = document.getElementById('notifBadge');
+      if (!badge) return;
+
+      const unread = APP_STATE.notifications.filter(n => !n.read).length;
+      if (unread > 0) {
+        badge.textContent = unread > 9 ? '9+' : unread;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function formatTimeAgo(isoStr) {
+      if (!isoStr) return 'Ora';
+      const diffSec = Math.floor((new Date() - new Date(isoStr)) / 1000);
+      if (diffSec < 60) return 'Ora';
+      if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m fa`;
+      if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h fa`;
+      return `${Math.floor(diffSec / 86400)}g fa`;
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+
+      const bgClass = type === 'success' 
+        ? 'bg-emerald-900/90 border-emerald-500/50 text-emerald-100' 
+        : type === 'warning' 
+        ? 'bg-amber-900/90 border-amber-500/50 text-amber-100' 
+        : 'bg-slate-800/95 border-binge-accent/50 text-slate-100';
+
+      const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-circle-info text-binge-accent';
+
+      toast.className = `p-3.5 rounded-2xl border ${bgClass} backdrop-blur-md shadow-2xl flex items-center gap-3 text-xs font-semibold transform transition-all duration-300 pointer-events-auto animate-bounce-once`;
+      
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} text-base"></i>
+        <span class="flex-1">${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function showView(viewId) {
+      ['viewHome', 'viewSearch', 'viewFavs', 'viewDetail'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      const activeEl = document.getElementById(viewId);
+      if (activeEl) activeEl.classList.remove('hidden');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   </script>
 </body>
 </html>
