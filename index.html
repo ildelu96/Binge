@@ -1,1136 +1,1313 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BINGE</title>
-  <style>
-    :root {
-      --bg-main: #0f172a;
-      --card-bg: #1e293b;
-      --text-main: #ffffff;
-      --text-muted: #94a3b8;
-      --accent-blue: #38bdf8;
-      --badge-blue: #0284c7;    
-      --badge-green: #10b981;   
-      --badge-purple: #a855f7;
-      --badge-red: #ef4444;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      padding-bottom: 50px;
-      overflow-x: hidden;
-    }
-
-    /* HEADER GLOBALE */
-    header {
-      background: rgba(15, 23, 42, 0.95);
-      padding: 15px 4%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    /* LOGO: SOLO TESTO PULITO SENZA IMMAGINI */
-    .logo {
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: var(--accent-blue);
-      letter-spacing: 2px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .notif-btn {
-      position: relative;
-      background: rgba(30, 41, 59, 0.8);
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .notif-badge {
-      position: absolute;
-      top: -6px; right: -6px;
-      background: var(--badge-red);
-      color: #fff;
-      font-size: 0.65rem;
-      font-weight: bold;
-      padding: 2px 6px;
-      border-radius: 10px;
-      display: none;
-    }
-
-    .menu-container { position: relative; }
-    .menu-btn {
-      background: rgba(30, 41, 59, 0.8);
-      color: #fff;
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 45px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      width: 220px;
-      z-index: 110;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-    }
-    .dropdown-menu.show { display: block; }
-    .dropdown-item {
-      padding: 12px 15px;
-      font-size: 0.85rem;
-      color: #fff;
-      cursor: pointer;
-      border-bottom: 1px solid #334155;
-    }
-    .dropdown-item:hover { background: #334155; }
-
-    /* CONTROLS & SEARCH BAR */
-    .controls-container {
-      margin-top: 75px;
-      padding: 15px 4% 5px 4%;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .search-input, .year-select {
-      padding: 10px 15px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #fff;
-      border-radius: 6px;
-      outline: none;
-    }
-    .search-input { flex: 1; min-width: 200px; }
-
-    /* RETTANGOLO GROSSO (HERO CAROUSEL TOP ANIME) */
-    .hero-banner {
-      margin: 15px 4% 10px 4%;
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-      height: 320px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-    .hero-bg {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-size: cover;
-      background-position: center 20%;
-      filter: brightness(0.45);
-      transition: background-image 0.5s ease-in-out;
-    }
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      padding: 30px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      background: linear-gradient(to top, rgba(15,23,42,0.95) 10%, rgba(15,23,42,0.2) 70%, transparent 100%);
-    }
-    .hero-tag {
-      display: inline-block;
-      background: var(--accent-blue);
-      color: #0f172a;
-      font-size: 0.7rem;
-      font-weight: 900;
-      padding: 4px 10px;
-      border-radius: 4px;
-      margin-bottom: 8px;
-      align-self: flex-start;
-      text-transform: uppercase;
-    }
-    .hero-title { font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 8px; line-height: 1.2; }
-    .hero-desc { font-size: 0.85rem; color: #cbd5e1; max-width: 600px; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .hero-actions { display: flex; gap: 10px; }
-    .hero-btn {
-      padding: 10px 20px;
-      background: var(--accent-blue);
-      color: #0f172a;
-      border: none;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .hero-btn:hover { background: #7dd3fc; }
-
-    .carousel-arrows {
-      position: absolute;
-      top: 50%;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      transform: translateY(-50%);
-      z-index: 5;
-      padding: 0 10px;
-      pointer-events: none;
-    }
-    .arrow-btn {
-      pointer-events: auto;
-      background: rgba(15, 23, 42, 0.7);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.2);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-    }
-    .arrow-btn:hover { background: var(--accent-blue); color: #0f172a; }
-
-    /* LAYOUT RIGHE HOME */
-    .row-container { margin-top: 25px; padding: 0 0 0 4%; }
-    .row-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-right: 4%;
-    }
-    .row-posters {
-      display: flex;
-      overflow-x: auto;
-      overflow-y: hidden;
-      gap: 12px;
-      padding-bottom: 15px;
-      scroll-behavior: smooth;
-    }
-    .row-posters::-webkit-scrollbar { height: 6px; }
-    .row-posters::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-
-    /* CARDS & BOLLINI */
-    .netflix-card {
-      flex: 0 0 auto;
-      width: 140px;
-      position: relative;
-      border-radius: 6px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      background: var(--card-bg);
-      border: 1px solid #334155;
-    }
-    @media (min-width: 768px) { .netflix-card { width: 170px; } }
-    .netflix-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); z-index: 10; }
-    .netflix-card img { width: 100%; height: 210px; object-fit: cover; display: block; }
-    @media (min-width: 768px) { .netflix-card img { height: 250px; } }
-
-    .status-badge {
-      position: absolute;
-      top: 6px; right: 6px;
-      padding: 3px 6px;
-      border-radius: 4px;
-      font-size: 0.55rem;
-      font-weight: 800;
-      color: #fff;
-      text-transform: uppercase;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    }
-    .badge-blue { background: var(--badge-blue); }
-    .badge-green { background: var(--badge-green); }
-    .badge-purple { background: var(--badge-purple); }
-
-    .card-title {
-      padding: 8px 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-align: center;
-    }
-
-    /* PANNELLO NOTIFICHE */
-    .notif-drawer {
-      display: none;
-      position: fixed;
-      top: 65px;
-      right: 4%;
-      width: 340px;
-      max-width: 90vw;
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      z-index: 150;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      padding: 15px;
-      max-height: 450px;
-      overflow-y: auto;
-    }
-    .notif-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      border-bottom: 1px solid #334155;
-      padding-bottom: 8px;
-    }
-    .notif-item {
-      background: #0f172a;
-      padding: 10px;
-      border-radius: 6px;
-      margin-bottom: 8px;
-      border-left: 4px solid var(--accent-blue);
-      font-size: 0.82rem;
-      cursor: pointer;
-    }
-    .notif-item.unread { border-left-color: var(--badge-red); background: #1a233a; }
-    .notif-item-title { font-weight: bold; margin-bottom: 4px; color: #fff; }
-    .notif-item-desc { color: #cbd5e1; margin-bottom: 4px; }
-    .notif-item-date { font-size: 0.7rem; color: #94a3b8; }
-
-    /* AUTH MODAL */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(6px);
-      z-index: 200;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    .modal-content {
-      background: #1e293b;
-      color: #fff;
-      width: 100%;
-      max-width: 360px;
-      border-radius: 8px;
-      padding: 25px;
-      border: 1px solid #334155;
-      text-align: center;
-    }
-    .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
-    .auth-input { width: 100%; margin-bottom: 12px; }
-    .error-msg { color: #ef4444; font-size: 0.85rem; margin-bottom: 10px; display: none; }
-
-    /* BOTTONI GLOBALI */
-    .action-btn {
-      width: 100%;
-      padding: 12px;
-      background: var(--badge-blue);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-top: 10px;
-    }
-    .action-btn:hover { background: var(--accent-blue); }
-    .btn-secondary { background: #334155; }
-    .btn-secondary:hover { background: #475569; }
-
-    /* LAYOUT PAGINA DETTAGLI FULL PAGE */
-    #view-details { display: none; padding: 85px 4% 40px 4%; }
-    .back-btn {
-      background: transparent;
-      color: var(--accent-blue);
-      border: 1px solid var(--accent-blue);
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .back-btn:hover { background: rgba(56, 189, 248, 0.1); }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BINGE - Anime Tracking & Cloud Sync</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    .details-grid { display: flex; flex-direction: column; gap: 25px; }
-    @media(min-width: 768px) {
-      .details-grid { flex-direction: row; align-items: flex-start; }
-      .details-poster-area { width: 280px; flex-shrink: 0; position: sticky; top: 90px; }
-    }
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              mainBg: '#0f172a',
+              cardBg: '#1e293b',
+              accentBlue: '#38bdf8',
+              accentDark: '#0284c7',
+              slateBorder: '#334155'
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
     
-    .details-poster-area img { width: 100%; border-radius: 8px; border: 1px solid #334155; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-    .details-info-area { flex: 1; }
-    .details-title { font-size: 2rem; margin-bottom: 10px; }
-    
-    .details-meta { display: flex; gap: 15px; font-size: 0.9rem; color: var(--accent-blue); font-weight: 700; margin-bottom: 15px; }
-    .genres-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-    .genre-tag { background: #334155; color: #f8fafc; font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; font-weight: 600; }
-    
-    /* SELETTORE STAGIONI / ARCHI NARRATIVI */
-    .seasons-tabs { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; }
-    .season-tab {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #94a3b8;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .season-tab.active { background: var(--accent-blue); color: #0f172a; border-color: var(--accent-blue); }
-
-    .details-desc { font-size: 0.95rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 30px; }
-    
-    .episodes-container { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-    .episode-card { background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
-    .ep-title { font-weight: bold; color: #fff; }
-    .ep-date { font-size: 0.8rem; color: #94a3b8; }
-
-    /* TOAST MESSAGE NOTIFICATIONS */
-    .toast-container {
-      position: fixed;
-      bottom: 25px;
-      right: 25px;
-      z-index: 300;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .toast {
-      background: #1e293b;
-      color: #fff;
-      border-left: 4px solid var(--accent-blue);
-      padding: 12px 20px;
-      border-radius: 6px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-      font-size: 0.85rem;
-      animation: fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  </style>
+    <style>
+      body {
+        background-color: #0f172a;
+        color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+        overflow-x: hidden;
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #38bdf8;
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .glass-header {
+        background: rgba(15, 23, 42, 0.88);
+        backdrop-filter: blur(16px);
+      }
+      .hero-gradient {
+        background: linear-gradient(180deg, rgba(15,23,42,0.1) 0%, rgba(15,23,42,0.7) 60%, #0f172a 100%);
+      }
+      .hero-side-gradient {
+        background: linear-gradient(90deg, #0f172a 0%, rgba(15,23,42,0.85) 45%, rgba(15,23,42,0.1) 100%);
+      }
+      .card-hover {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.25);
+      }
+      @keyframes toastSlide {
+        from { transform: translateY(100%) opacity(0); }
+        to { transform: translateY(0) opacity(1); }
+      }
+      .animate-toast {
+        animation: toastSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+    </style>
 </head>
-<body>
+<body class="bg-mainBg text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
 
-  <!-- HEADER GLOBALE (LOGO SOLO TESTO) -->
-  <header id="header">
-    <div class="logo" onclick="goHome()">BINGE</div>
-    <div class="header-actions">
-      <!-- TASTO NOTIFICHE -->
-      <button class="notif-btn" onclick="toggleNotifications()" title="Notifiche">
-        🔔 <span class="notif-badge" id="notif-count">0</span>
-      </button>
+    <!-- Top Header / Navigation Bar -->
+    <header class="fixed top-0 left-0 right-0 z-40 glass-header border-b border-slate-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            
+            <!-- Logo Section: Clean Text Only BINGE (No emojis/images) -->
+            <div class="flex items-center gap-8">
+                <button onclick="navigateTo('home')" class="group flex items-center focus:outline-none">
+                    <span class="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400 group-hover:from-sky-300 group-hover:to-blue-300 transition-all">
+                        BINGE
+                    </span>
+                </button>
 
-      <div class="menu-container">
-        <button class="menu-btn" onclick="toggleMenu()" id="main-menu-btn">Accedi ▼</button>
-        <div class="dropdown-menu" id="dropdown-menu">
-          <div id="auth-menu-items"></div>
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+                    <button onclick="navigateTo('home')" id="nav-home" class="text-sky-400 hover:text-sky-300 transition">Home</button>
+                    <button onclick="navigateTo('favorites')" id="nav-favorites" class="text-slate-300 hover:text-sky-400 transition flex items-center gap-1.5">
+                        <span>Preferiti</span>
+                        <span id="favCountBadge" class="bg-sky-500/20 text-sky-400 text-xs px-2 py-0.5 rounded-full border border-sky-500/30 font-semibold">0</span>
+                    </button>
+                    <button onclick="scrollToSection('row-new')" class="text-slate-300 hover:text-sky-400 transition">Nuove Uscite</button>
+                    <button onclick="scrollToSection('row-popular')" class="text-slate-300 hover:text-sky-400 transition">Popolari</button>
+                </nav>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="flex-1 max-w-md relative hidden sm:block">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInput" oninput="handleSearch(this.value)" 
+                       placeholder="Cerca anime, generi o episodi..." 
+                       class="w-full bg-slate-900/90 text-sm text-slate-100 placeholder-slate-400 pl-10 pr-4 py-2 rounded-full border border-slate-700/70 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition">
+            </div>
+
+            <!-- Header Actions: Sync & Notifications -->
+            <div class="flex items-center gap-3">
+                <!-- Multi-Device Sync Cloud Button -->
+                <button onclick="openAuthModal()" id="syncStatusBtn" title="Sincronizzazione Cloud Multi-Dispositivo" 
+                        class="flex items-center gap-2 bg-slate-800/90 hover:bg-slate-700/80 text-xs sm:text-sm font-medium px-3 py-1.5 rounded-full border border-slate-700 transition">
+                    <span id="syncDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="syncText" class="hidden sm:inline text-slate-200">Sincronizzato</span>
+                    <i class="fa-solid fa-cloud text-sky-400"></i>
+                </button>
+
+                <!-- Notifications Bell Button -->
+                <button onclick="toggleNotificationsDrawer()" class="relative p-2 text-slate-300 hover:text-sky-400 hover:bg-slate-800 rounded-full transition focus:outline-none">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span id="notifBadge" class="hidden absolute top-1 right-1 bg-sky-500 text-slate-950 font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center border border-slate-900">0</span>
+                </button>
+            </div>
         </div>
-      </div>
-    </div>
-  </header>
+    </header>
 
-  <!-- DRAWER NOTIFICHE -->
-  <div class="notif-drawer" id="notif-drawer">
-    <div class="notif-header">
-      <h3 style="font-size:1rem; color:#fff;">Notifiche Preferiti</h3>
-      <span style="font-size:0.75rem; color:var(--accent-blue); cursor:pointer;" onclick="clearAllNotifications()">Svuota</span>
-    </div>
-    <div id="notif-list-container">
-      <div style="color:#94a3b8; font-size:0.85rem; text-align:center; padding:15px;">Nessuna nuova notifica.</div>
-    </div>
-  </div>
-
-  <input type="file" id="import-file" style="display:none" onchange="importHistory(event)">
-
-  <!-- ==================== VISTA HOME ==================== -->
-  <div id="view-home">
-    <div class="controls-container">
-      <input type="text" id="search-input" class="search-input" placeholder="🔍 Cerca qualsiasi anime..." oninput="handleSearch()">
-      
-      <select id="year-select" class="year-select" onchange="filterByYear()">
-        <option value="">📅 Filtra per Annata</option>
-        <option value="2020..2026">Anni 2020+</option>
-        <option value="2010..2019">Anni 2010-2019</option>
-        <option value="2000..2009">Anni 2000-2009</option>
-      </select>
-    </div>
-
-    <!-- RETTANGOLO GROSSO: TOP ANIME CAROUSEL -->
-    <div class="hero-banner" id="hero-banner">
-      <div class="hero-bg" id="hero-bg"></div>
-      <div class="carousel-arrows">
-        <button class="arrow-btn" onclick="prevHero()">◄</button>
-        <button class="arrow-btn" onclick="nextHero()">►</button>
-      </div>
-      <div class="hero-content">
-        <span class="hero-tag" id="hero-tag">TOP DEL MESE</span>
-        <h1 class="hero-title" id="hero-title">Caricamento...</h1>
-        <p class="hero-desc" id="hero-desc">Descrizione in arrivo...</p>
-        <div class="hero-actions">
-          <button class="hero-btn" id="hero-play-btn" onclick="">Guarda Scheda</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- RISULTATI RICERCA -->
-    <div id="searchResultsSection" class="row-container" style="display:none;">
-      <div class="row-title" id="search-title">Risultati Ricerca</div>
-      <div class="row-posters" id="search-grid" style="flex-wrap: wrap; overflow-x: visible;"></div>
-    </div>
-
-    <div id="mainRows">
-      <!-- 1ª RIGA: NUOVE USCITE -->
-      <div class="row-container">
-        <div class="row-title">🌟 Nuove Uscite</div>
-        <div class="row-posters" id="row-new-releases"></div>
-      </div>
-
-      <!-- 2ª RIGA: I TUOI PREFERITI -->
-      <div class="row-container">
-        <div class="row-title"><span id="favorites-title">❤️ I Tuoi Preferiti</span></div>
-        <div class="row-posters" id="row-favorites"></div>
-      </div>
-
-      <!-- 3ª RIGA: CONSIGLIATI PER TE -->
-      <div class="row-container">
-        <div class="row-title">🤖 Consigliati per Te</div>
-        <div class="row-posters" id="row-ai-recommendations"></div>
-      </div>
-
-      <!-- 4ª RIGA: POPOLARI DEL MOMENTO -->
-      <div class="row-container">
-        <div class="row-title">🔥 I Popolari del Momento</div>
-        <div class="row-posters" id="row-top-ita"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== VISTA DETTAGLI (FULL PAGE) ==================== -->
-  <div id="view-details">
-    <button class="back-btn" onclick="goHome()">⬅ Torna alla Home</button>
-    
-    <div class="details-grid">
-      <!-- Colonna Sinistra: Locandina e Azioni -->
-      <div class="details-poster-area">
-        <img id="detail-poster" src="" alt="Locandina">
-        <button class="action-btn" id="save-btn" onclick="toggleSaveAnime()">➕ Aggiungi ai Preferiti</button>
-        <button class="action-btn btn-secondary" style="font-size:0.75rem;" onclick="simulateNotification()">🔔 Testa Notifica Simulata</button>
-      </div>
-
-      <!-- Colonna Destra: Info, Stagioni ed Episodi -->
-      <div class="details-info-area">
-        <h1 class="details-title" id="detail-title">Nome Anime</h1>
-        <div class="details-meta">
-          <span id="detail-episodes">📺 -- Episodi</span>
-          <span id="detail-status">🟢 Status</span>
-        </div>
-        <div class="genres-list" id="detail-genres"></div>
-
-        <!-- STAGIONI / ARCHI NARRATIVI -->
-        <div class="seasons-tabs" id="seasons-tabs" style="display:none;"></div>
-
-        <p class="details-desc" id="detail-description">Descrizione...</p>
+    <main id="appContent" class="pt-16 flex-1 pb-16">
         
-        <div>
-          <h2 style="font-size: 1.3rem; margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 10px;">📜 Elenco Puntate</h2>
-          <div class="episodes-container" id="detail-episodes-list">
-            <!-- Popolato da JS -->
-          </div>
+        <!-- ================= HOME VIEW ================= -->
+        <div id="view-home" class="space-y-10">
+            
+            <!-- Hero Banner ("Rettangolo Grosso") Carousel -->
+            <section class="relative w-full min-h-[500px] sm:min-h-[580px] lg:min-h-[640px] flex items-end overflow-hidden bg-slate-950 border-b border-slate-800/60">
+                <!-- Hero Backdrop Image -->
+                <div id="heroBackdrop" class="absolute inset-0 bg-cover bg-center transition-all duration-700 scale-105"></div>
+                <!-- Gradients Overlay -->
+                <div class="absolute inset-0 hero-gradient"></div>
+                <div class="absolute inset-0 hero-side-gradient hidden md:block"></div>
+
+                <!-- Hero Content Box -->
+                <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 w-full z-10">
+                    <div class="max-w-2xl space-y-4">
+                        <!-- Status & Rating Badges -->
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <span id="heroStatusBadge" class="px-2.5 py-1 text-xs font-bold rounded-md uppercase tracking-wider bg-blue-600 text-white">
+                                🔵 IN CORSO
+                            </span>
+                            <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
+                                <i class="fa-solid fa-star text-amber-400"></i> <span id="heroRating">9.2</span>
+                            </span>
+                            <span id="heroYear" class="text-xs font-semibold text-slate-300 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700">2024</span>
+                            <span id="heroGenres" class="text-xs font-medium text-sky-300">Azione • Fantasy</span>
+                        </div>
+
+                        <!-- Hero Title -->
+                        <h1 id="heroTitle" class="text-3xl sm:text-5xl font-black tracking-tight text-white drop-shadow-md">
+                            Solo Leveling - Stagione 2
+                        </h1>
+
+                        <!-- Hero Synopsis -->
+                        <p id="heroSynopsis" class="text-sm sm:text-base text-slate-300 line-clamp-3 leading-relaxed drop-shadow">
+                            Sung Jinwoo continua la sua ascesa da cacciatore di grado E a Sovrano delle Ombre definitivo, affrontando nuove minacce e cancelli di rango S.
+                        </p>
+
+                        <!-- Hero Action Buttons -->
+                        <div class="flex items-center gap-4 pt-2">
+                            <button id="heroDetailBtn" onclick="" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 shadow-lg shadow-sky-500/20">
+                                <i class="fa-solid fa-circle-info text-base"></i>
+                                <span>Guarda Dettagli</span>
+                            </button>
+                            <button id="heroFavBtn" onclick="" class="bg-slate-800/90 hover:bg-slate-700 text-white font-semibold px-5 py-3 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                                <i class="fa-regular fa-heart text-sky-400"></i>
+                                <span>Preferiti</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Carousel Controls & Indicators -->
+                    <div class="absolute right-4 bottom-12 hidden md:flex items-center gap-3 bg-slate-900/80 p-2 rounded-2xl border border-slate-800 backdrop-blur-md">
+                        <button onclick="prevHeroSlide()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <div id="heroDots" class="flex items-center gap-1.5 px-2">
+                            <!-- Dots generated dynamically -->
+                        </div>
+                        <button onclick="nextHeroSlide()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Content Container with Exact Required Row Hierarchy -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                
+                <!-- ROW 1: 🌟 Nuove Uscite -->
+                <section id="row-new" class="space-y-4">
+                    <div class="flex items-center justify-between border-l-4 border-sky-400 pl-3">
+                        <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                            <span>🌟 Nuove Uscite</span>
+                        </h2>
+                        <span class="text-xs text-slate-400">Episodi aggiornati di recente</span>
+                    </div>
+                    <div id="grid-nuove-uscite" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <!-- Anime cards inserted dynamically -->
+                    </div>
+                </section>
+
+                <!-- ROW 2: ❤️ I Tuoi Preferiti (Synced live) -->
+                <section id="row-favorites" class="space-y-4">
+                    <div class="flex items-center justify-between border-l-4 border-rose-500 pl-3">
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                                <span>❤️ I Tuoi Preferiti</span>
+                            </h2>
+                            <span class="bg-slate-800 text-sky-400 text-xs px-2.5 py-0.5 rounded-full border border-slate-700 flex items-center gap-1">
+                                <i class="fa-solid fa-rotate text-[10px] animate-spin"></i> Sincronizzato Cloud
+                            </span>
+                        </div>
+                        <button onclick="navigateTo('favorites')" class="text-xs text-sky-400 hover:underline">Vedi tutti</button>
+                    </div>
+
+                    <!-- Favorites Carousel/Grid -->
+                    <div id="grid-preferiti" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <!-- Dynamic favorite items or empty state -->
+                    </div>
+                </section>
+
+                <!-- ROW 3: 🤖 Consigliati per Te -->
+                <section id="row-recommended" class="space-y-4">
+                    <div class="flex items-center justify-between border-l-4 border-indigo-500 pl-3">
+                        <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                            <span>🤖 Consigliati per Te</span>
+                        </h2>
+                        <span class="text-xs text-slate-400">In base ai tuoi gusti</span>
+                    </div>
+                    <div id="grid-consigliati" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <!-- Dynamic cards -->
+                    </div>
+                </section>
+
+                <!-- ROW 4: 🔥 I Popolari del Momento -->
+                <section id="row-popular" class="space-y-4">
+                    <div class="flex items-center justify-between border-l-4 border-amber-500 pl-3">
+                        <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                            <span>🔥 I Popolari del Momento</span>
+                        </h2>
+                        <span class="text-xs text-slate-400">I titoli più seguiti dalla community</span>
+                    </div>
+                    <div id="grid-popolari" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <!-- Dynamic cards -->
+                    </div>
+                </section>
+
+            </div>
         </div>
-      </div>
+
+        <!-- ================= FAVORITES FULL VIEW ================= -->
+        <div id="view-favorites" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-white flex items-center gap-3">
+                        <span>❤️ La Tua Collezione Preferiti</span>
+                    </h1>
+                    <p class="text-sm text-slate-400 mt-1">Sincronizzata in tempo reale su tutti i tuoi dispositivi tramite Firebase.</p>
+                </div>
+                <button onclick="navigateTo('home')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-sm border border-slate-700 transition">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Torna alla Home
+                </button>
+            </div>
+
+            <div id="fullFavoritesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+                <!-- Favorites items -->
+            </div>
+        </div>
+
+        <!-- ================= ANIME DETAIL VIEW ================= -->
+        <div id="view-detail" class="hidden min-h-screen pb-20">
+            <!-- Backdrop Header -->
+            <div class="relative w-full h-72 sm:h-96 lg:h-[420px] bg-slate-950 overflow-hidden">
+                <div id="detailBackdrop" class="absolute inset-0 bg-cover bg-center filter blur-xs scale-105 opacity-60"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-mainBg via-mainBg/60 to-transparent"></div>
+                
+                <button onclick="closeDetailView()" class="absolute top-6 left-6 z-20 bg-slate-900/80 hover:bg-slate-800 text-white p-3 rounded-full border border-slate-700 backdrop-blur-md transition shadow-lg">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Detail Info Overlay Card -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 sm:-mt-48 relative z-10 space-y-10">
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    
+                    <!-- Poster Image -->
+                    <div class="w-48 sm:w-64 shrink-0 rounded-2xl overflow-hidden border-2 border-slate-700/80 shadow-2xl bg-slate-900">
+                        <img id="detailPoster" src="" alt="Poster" class="w-full h-auto object-cover">
+                    </div>
+
+                    <!-- Details Meta -->
+                    <div class="flex-1 space-y-4 pt-2">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <span id="detailStatusBadge" class="px-3 py-1 text-xs font-bold rounded-lg uppercase tracking-wider text-white">
+                                🔵 IN CORSO
+                            </span>
+                            <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold px-3 py-1 rounded-lg flex items-center gap-1">
+                                <i class="fa-solid fa-star text-amber-400"></i> <span id="detailRating">9.2</span>
+                            </span>
+                            <span id="detailYear" class="text-xs font-semibold text-slate-300 bg-slate-800 px-3 py-1 rounded-lg border border-slate-700">2024</span>
+                            <span id="detailStudio" class="text-xs font-medium text-slate-400 bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700/60">A-1 Pictures</span>
+                        </div>
+
+                        <h1 id="detailTitle" class="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                            Anime Title
+                        </h1>
+
+                        <div id="detailGenres" class="flex flex-wrap gap-2 text-xs font-medium text-sky-400">
+                            <!-- Genre pills -->
+                        </div>
+
+                        <p id="detailSynopsis" class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-4xl">
+                            Synopsis description...
+                        </p>
+
+                        <!-- Actions Bar -->
+                        <div class="flex flex-wrap items-center gap-4 pt-4 border-t border-slate-800">
+                            <button id="detailFavToggleBtn" onclick="" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-6 py-3 rounded-xl transition flex items-center gap-2 shadow-lg shadow-sky-500/20">
+                                <i class="fa-solid fa-heart"></i>
+                                <span>Aggiungi ai Preferiti</span>
+                            </button>
+
+                            <!-- SIMULATED NOTIFICATION TRIGGER BUTTON -->
+                            <button id="detailSimulateNotifBtn" onclick="" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold px-5 py-3 rounded-xl border border-amber-500/30 transition flex items-center gap-2">
+                                <i class="fa-solid fa-bell-ring text-amber-400 animate-bounce"></i>
+                                <span>Testa Notifica Simulata</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Franchise / Seasons Switcher Tabs -->
+                <div class="space-y-6 pt-6 border-t border-slate-800">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-sky-400"></i>
+                            <span>Stagioni & Episodi</span>
+                        </h2>
+                    </div>
+
+                    <!-- Season Tabs -->
+                    <div id="seasonTabsContainer" class="flex items-center gap-3 overflow-x-auto pb-2 border-b border-slate-800">
+                        <!-- Dynamic season tabs -->
+                    </div>
+
+                    <!-- Restored Episode Air Date & Day of the Week Header Banner -->
+                    <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                                <i class="fa-regular fa-calendar-days text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">Calendario Uscite Rilasciate</h3>
+                                <p class="text-xs text-slate-400">Ogni episodio mostra la data di rilascio esatta con il giorno della settimana in italiano.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Episode List with Exact Italian Air Dates & Weekday -->
+                    <div id="episodesList" class="space-y-3">
+                        <!-- Dynamic episode items -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Notifications Right Side Drawer -->
+    <div id="notificationsDrawer" class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-slate-900 border-l border-slate-800 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-bell text-sky-400"></i>
+                <h3 class="font-bold text-lg text-white">Centro Notifiche</h3>
+            </div>
+            <button onclick="toggleNotificationsDrawer()" class="text-slate-400 hover:text-white p-2 rounded-lg">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <div id="notificationsList" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <!-- Notifications items dynamically populated -->
+        </div>
+
+        <div class="p-4 border-t border-slate-800 bg-slate-950/60">
+            <button onclick="clearAllNotifications()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium border border-slate-700 transition">
+                Svuota Notifiche
+            </button>
+        </div>
     </div>
-  </div>
 
-  <!-- MODAL AUTENTICAZIONE E REGISTRAZIONE -->
-  <div class="modal" id="auth-modal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeAuthModal()">&times;</span>
-      <h2 style="margin-bottom: 15px; color: var(--accent-blue);" id="auth-modal-title">Accedi a BINGE</h2>
-      <div id="auth-error" class="error-msg">Credenziali errate.</div>
-      <input type="text" id="auth-username" placeholder="Username" class="search-input auth-input">
-      <input type="password" id="auth-password" placeholder="Password" class="search-input auth-input">
-      <button class="action-btn" onclick="handleLogin()">🔑 Accedi</button>
-      <button class="action-btn btn-secondary" onclick="handleRegister()">📝 Crea un nuovo account</button>
+    <!-- Multi-Device Cloud Sync Auth Modal -->
+    <div id="authModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 bg-sky-500/20 text-sky-400 rounded-2xl border border-sky-500/30 flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white">Sincronizzazione Cloud Multi-Dispositivo</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Visualizza i tuoi preferiti e le notifiche da qualsiasi smartphone, tablet o computer.
+                </p>
+            </div>
+
+            <!-- Current User Info Box -->
+            <div id="userSyncBox" class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80 space-y-2">
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span>Stato Sincronizzazione:</span>
+                    <span id="modalSyncStatus" class="text-emerald-400 font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-circle text-[8px]"></i> Attivo
+                    </span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-300">ID Utente Cloud:</span>
+                    <button onclick="copyUserId()" class="text-xs text-sky-400 hover:underline flex items-center gap-1">
+                        <i class="fa-regular fa-copy"></i> Copia ID
+                    </button>
+                </div>
+                <p id="currentUserIdText" class="text-xs font-mono bg-slate-950 p-2 rounded-lg text-slate-300 truncate select-all">
+                    Caricamento...
+                </p>
+            </div>
+
+            <!-- Email Login / Register Form -->
+            <div class="space-y-3 pt-2 border-t border-slate-800">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Accedi con Email per unire i dispositivi</h4>
+                
+                <input type="email" id="authEmail" placeholder="Nome utente o email" 
+                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-400">
+                
+                <input type="password" id="authPassword" placeholder="Password (minimo 6 caratteri)" 
+                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-400">
+
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button onclick="handleLogin()" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition">
+                        Accedi
+                    </button>
+                    <button onclick="handleRegister()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 rounded-xl text-sm border border-slate-700 transition">
+                        Registrati
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- CONTENITORE TOAST -->
-  <div class="toast-container" id="toast-container"></div>
+    <!-- Floating Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none max-w-sm w-full px-4">
+        <!-- Dynamic Toast Items -->
+    </div>
 
-  <script>
-    // --- DATABASE LOCALE E UTENTI ---
-    let currentUser = localStorage.getItem('binge_current_user') || null;
-    let usersDb = JSON.parse(localStorage.getItem('binge_users_db') || '{}');
-    let savedList = []; 
-    let userNotifications = [];
-    let currentAnimeData = [];
-    let selectedAnimeId = null;
-    let searchTimeout = null;
-    let heroAnimeList = [];
-    let currentHeroIndex = 0;
-    let heroInterval = null;
+    <!-- Firebase Firebase JS SDK Module Import -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            onSnapshot, 
+            collection 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- SISTEMA TOAST MESSAGE ---
-    function showToast(msg) {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.innerText = msg;
-      container.appendChild(toast);
-      setTimeout(() => toast.remove(), 3500);
-    }
+        // Comprehensive Dataset of Anime
+        const ANIME_DATABASE = [
+            {
+                id: 'solo-leveling-s2',
+                title: 'Solo Leveling - Stagione 2: Arise from the Shadow',
+                poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop',
+                backdrop: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1200&auto=format&fit=crop',
+                status: 'IN CORSO', // 🔵 IN CORSO
+                statusType: 'in-corso',
+                rating: '9.2',
+                year: '2024',
+                studio: 'A-1 Pictures',
+                genres: ['Azione', 'Fantasy', 'Soprannaturale'],
+                synopsis: 'Sung Jinwoo continua la sua inarrestabile ascesa da cacciatore di grado E a Sovrano delle Ombre definitivo, affrontando la minaccia imminente dei Monarchi e dei Portali di rango S.',
+                featured: true,
+                seasons: [
+                    {
+                        name: 'Stagione 2 (In Corso)',
+                        episodes: [
+                            { id: 'sl-s2-e1', number: 'Episodio 1', title: "Un'Ombra Rinata", airDate: 'Sabato, 5 Ottobre 2024', duration: '24m', overview: "Jinwoo testa i suoi nuovi poteri di estrazione delle ombre nei sotterranei di grado A." },
+                            { id: 'sl-s2-e2', number: 'Episodio 2', title: 'Il Cancello Rosso', airDate: 'Sabato, 12 Ottobre 2024', duration: '25m', overview: "Una spedizione di addestramento si trasforma in una trappola mortale nel reame dei giganti del ghiaccio." },
+                            { id: 'sl-s2-e3', number: 'Episodio 3', title: 'Il Dominio del Monarca', airDate: 'Sabato, 19 Ottobre 2024', duration: '24m', overview: "I cacciatori di grado S si riuniscono per valutare l'improvvisa crescita d'impatto di Sung Jinwoo." },
+                            { id: 'sl-s2-e4', number: 'Episodio 4', title: 'Scontro al Vertice', airDate: 'Sabato, 26 Ottobre 2024', duration: '25m', overview: "Un nuovo nemico giunge dagli abissi mettendo alla prova l'Esercito delle Ombre." },
+                            { id: 'sl-s2-e5', number: 'Episodio 5', title: "L'Isola di Jeju: Preludio", airDate: 'Sabato, 2 Novembre 2024', duration: '24m', overview: "I preparativi per la quarta incursione sull'isola delle formiche mostro hanno inizio." }
+                        ]
+                    },
+                    {
+                        name: 'Stagione 1',
+                        episodes: [
+                            { id: 'sl-s1-e1', number: 'Episodio 1', title: 'Il Cacciatore più debole', airDate: 'Sabato, 6 Gennaio 2024', duration: '24m', overview: 'Jinwoo affronta il doppio dungeon cambiando per sempre il suo destino.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'dandadan',
+                title: 'Dandadan',
+                poster: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop',
+                backdrop: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=1200&auto=format&fit=crop',
+                status: 'IN CORSO',
+                statusType: 'in-corso',
+                rating: '8.9',
+                year: '2024',
+                studio: 'Science SARU',
+                genres: ['Sci-Fi', 'Commedia', 'Soprannaturale'],
+                synopsis: 'Momo Ayase e Okarun, una ragazza che crede nei fantasmi e un ragazzo appassionato di alieni, si ritrovano immersi in scontri folli con entità paranormali ed extraterrestri.',
+                featured: true,
+                seasons: [
+                    {
+                        name: 'Stagione 1',
+                        episodes: [
+                            { id: 'ddd-e1', number: 'Episodio 1', title: 'È un Amore Fantasma?', airDate: 'Giovedì, 3 Ottobre 2024', duration: '24m', overview: 'Momo e Okarun stringono un patto per dimostrare l’esistenza delle rispettive credenze.' },
+                            { id: 'ddd-e2', number: 'Episodio 2', title: 'La Nonna Turbo', airDate: 'Giovedì, 10 Ottobre 2024', duration: '24m', overview: 'Lo spirito della Nonna Turbo maledice Okarun scatenando il caos a scuola.' },
+                            { id: 'ddd-e3', number: 'Episodio 3', title: 'Incontro Ravvicinato', airDate: 'Giovedì, 17 Ottobre 2024', duration: '24m', overview: 'Gli alieni Serpo tentano di rapire Momo per assorbire la sua energia spirituale.' },
+                            { id: 'ddd-e4', number: 'Episodio 4', title: 'La Trasformazione', airDate: 'Giovedì, 24 Ottobre 2024', duration: '24m', overview: 'Okarun impara a canalizzare la velocità soprannaturale della Nonna Turbo.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'demon-slayer-hashira',
+                title: 'Demon Slayer: Hashira Training Arc',
+                poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop',
+                backdrop: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=1200&auto=format&fit=crop',
+                status: 'COMPLETO', // 🟢 COMPLETO
+                statusType: 'completo',
+                rating: '8.8',
+                year: '2024',
+                studio: 'ufotable',
+                genres: ['Azione', 'Storico', 'Demoni'],
+                synopsis: 'Tanjiro e i cacciatori di demoni affrontano il durissimo programma di addestramento guidato dai Pilastri in vista della battaglia finale nel Castello Infinito.',
+                featured: true,
+                seasons: [
+                    {
+                        name: 'Hashira Training Arc',
+                        episodes: [
+                            { id: 'ds-e1', number: 'Episodio 1', title: 'Per Sconfiggere Muzan Kibutsuji', airDate: 'Domenica, 12 Maggio 2024', duration: '48m', overview: 'I Pilastri indicono una riunione d’emergenza per analizzare i marchi dei cacciatori.' },
+                            { id: 'ds-e2', number: 'Episodio 2', title: 'Il Dolore di Giyu Tomioka', airDate: 'Domenica, 19 Maggio 2024', duration: '24m', overview: 'Tanjiro tenta di scalfire l’isolamento del Pilastro dell’Acqua.' },
+                            { id: 'ds-e3', number: 'Episodio 3', title: 'L’Addestramento di Tengen Uzui', airDate: 'Domenica, 26 Maggio 2024', duration: '24m', overview: 'La resistenza fisica dei cacciatori viene messa a dura prova.' },
+                            { id: 'ds-e4', number: 'Episodio 4', title: 'La Forza dei Pilastri', airDate: 'Domenica, 2 Giugno 2024', duration: '24m', overview: 'Tanjiro supera le prove di Muichiro Tokito e Mitsuri Kanroji.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'chainsaw-man-reze',
+                title: 'Chainsaw Man - Film: Arco di Reze',
+                poster: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop',
+                backdrop: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=1200&auto=format&fit=crop',
+                status: 'IN ARRIVO', // 🟣 IN ARRIVO
+                statusType: 'in-arrivo',
+                rating: '9.4',
+                year: '2025',
+                studio: 'MAPPA',
+                genres: ['Azione', 'Dark Fantasy', 'Romance'],
+                synopsis: 'Denji incontra Reze, una ragazza solare che lavora in un bar, ritrovandosi catapultato in una trappola mortale orchestrata dall’Ombra del Demone Bomba.',
+                featured: true,
+                seasons: [
+                    {
+                        name: 'Film Cinematografico',
+                        episodes: [
+                            { id: 'csm-film', number: 'Film', title: 'Reze: Il Demone Bomba', airDate: 'Venerdì, 17 Gennaio 2025', duration: '1h 45m', overview: 'L’atteso adattamento cinematografico dell’arco di Reze.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'kaiju-no-8-s2',
+                title: 'Kaiju No. 8 - Stagione 2',
+                poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop',
+                backdrop: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&auto=format&fit=crop',
+                status: 'IN ARRIVO',
+                statusType: 'in-arrivo',
+                rating: '8.7',
+                year: '2025',
+                studio: 'Production I.G',
+                genres: ['Azione', 'Sci-Fi', 'Mostri'],
+                synopsis: 'Kafka Hibino difende l’umanità mantenendo segreta la sua capacità di trasformarsi nel letale Kaiju Numero 8 all’interno della Terza Divisione.',
+                featured: false,
+                seasons: [
+                    {
+                        name: 'Stagione 2',
+                        episodes: [
+                            { id: 'k8-e1', number: 'Episodio 1', title: 'Il Risveglio della Seconda Armata', airDate: 'Sabato, 5 Aprile 2025', duration: '24m', overview: 'Analisi dei poteri e nuove minacce di classe Kaiju.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'bleach-tybw-p3',
+                title: 'Bleach: Thousand-Year Blood War - Part 3',
+                poster: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=600&auto=format&fit=crop',
+                backdrop: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=1200&auto=format&fit=crop',
+                status: 'IN CORSO',
+                statusType: 'in-corso',
+                rating: '9.1',
+                year: '2024',
+                studio: 'Studio Pierrot',
+                genres: ['Azione', 'Soprannaturale', 'Shounen'],
+                synopsis: 'Lo scontro tra la Soul Society e l’esercito Quincy di Yhwach si sposta al Palazzo Reale per il destino dei tre mondi.',
+                featured: false,
+                seasons: [
+                    {
+                        name: 'Parte 3: The Conflict',
+                        episodes: [
+                            { id: 'bl-e1', number: 'Episodio 1', title: 'Il Conflitto Reale', airDate: 'Sabato, 5 Ottobre 2024', duration: '24m', overview: 'La Squadra Zero affronta la guardia d’élite di Yhwach.' },
+                            { id: 'bl-e2', number: 'Episodio 2', title: 'L’Ombra di Yhwach', airDate: 'Sabato, 12 Ottobre 2024', duration: '24m', overview: 'Ichigo giunge nel reame divino per fermare l’incursione.' },
+                            { id: 'bl-e3', number: 'Episodio 3', title: 'Il Destino dei Mondi', airDate: 'Sabato, 19 Ottobre 2024', duration: '25m', overview: 'Rivelazioni sconvolgenti sul Re delle Anime.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'frieren',
+                title: 'Frieren: Oltre la Fine del Viaggio',
+                poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop',
+                backdrop: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=1200&auto=format&fit=crop',
+                status: 'COMPLETO',
+                statusType: 'completo',
+                rating: '9.3',
+                year: '2024',
+                studio: 'Madhouse',
+                genres: ['Fantasy', 'Avventura', 'Drama'],
+                synopsis: 'L’elfa maga Frieren intraprende un lungo pellegrinaggio verso nord per comprendere i sentimenti umani dopo la scomparsa dei suoi compagni d’avventura.',
+                featured: false,
+                seasons: [
+                    {
+                        name: 'Stagione 1',
+                        episodes: [
+                            { id: 'fr-e1', number: 'Episodio 1', title: 'L’Inizio del Viaggio', airDate: 'Venerdì, 29 Settembre 2023', duration: '24m', overview: 'Decenni dopo la sconfitta del Re Demone, Frieren ritrova i vecchi eroi.' },
+                            { id: 'fr-e2', number: 'Episodio 2', title: 'Maga e Apprendista', airDate: 'Venerdì, 6 Ottobre 2023', duration: '24m', overview: 'Frieren accoglie la giovane Fern sotto la sua guida.' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'one-piece-egghead',
+                title: 'One Piece - Arco di Egghead',
+                poster: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&auto=format&fit=crop',
+                backdrop: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1200&auto=format&fit=crop',
+                status: 'IN CORSO',
+                statusType: 'in-corso',
+                rating: '9.0',
+                year: '2024',
+                studio: 'Toei Animation',
+                genres: ['Avventura', 'Azione', 'Sci-Fi'],
+                synopsis: 'I Cappello di Paglia sbarcano sull’avveniristica isola di Egghead incontrando il geniale Dr. Vegapunk.',
+                featured: false,
+                seasons: [
+                    {
+                        name: 'Arco Egghead',
+                        episodes: [
+                            { id: 'op-e1', number: 'Episodio 1089', title: 'L’Isola del Futuro', airDate: 'Domenica, 7 Gennaio 2024', duration: '24m', overview: 'Luffy scopre le meraviglie tecnologiche di Egghead.' },
+                            { id: 'op-e2', number: 'Episodio 1120', title: 'L’Attacco dei Seraphim', airDate: 'Domenica, 13 Ottobre 2024', duration: '24m', overview: 'Il CP0 tenta l’infiltrazione nei laboratori principali.' }
+                        ]
+                    }
+                ]
+            }
+        ];
 
-    // --- NAVIGAZIONE VISTE ---
-    function goHome() {
-      document.getElementById('view-details').style.display = 'none';
-      document.getElementById('view-home').style.display = 'block';
-      document.getElementById('notif-drawer').style.display = 'none';
-      window.scrollTo(0,0);
-    }
-    
-    function showDetailsPage() {
-      document.getElementById('view-home').style.display = 'none';
-      document.getElementById('view-details').style.display = 'block';
-      document.getElementById('notif-drawer').style.display = 'none';
-      window.scrollTo(0,0);
-    }
-
-    function toggleMenu() { document.getElementById('dropdown-menu').classList.toggle('show'); }
-
-    // --- AUTENTICAZIONE E USER SESSION ---
-    function initUserSession() {
-      if (currentUser) {
-        savedList = JSON.parse(localStorage.getItem(`binge_saved_${currentUser}`) || '[]');
-        userNotifications = JSON.parse(localStorage.getItem(`binge_notifs_${currentUser}`) || '[]');
-        
-        document.getElementById('main-menu-btn').innerText = `👤 ${currentUser} ▼`;
-        document.getElementById('favorites-title').innerText = `❤️ Preferiti di ${currentUser}`;
-        document.getElementById('auth-menu-items').innerHTML = `
-          <div class="dropdown-item" onclick="exportHistory()">📥 Esporta Preferiti</div>
-          <div class="dropdown-item" onclick="triggerImport()">📤 Importa Preferiti</div>
-          <div class="dropdown-item" style="color: #ef4444;" onclick="logout()">🚪 Esci (Logout)</div>
-        `;
-      } else {
-        savedList = [];
-        userNotifications = [];
-        document.getElementById('main-menu-btn').innerText = `Accedi ▼`;
-        document.getElementById('favorites-title').innerText = `❤️ I Tuoi Preferiti (Accedi per salvare)`;
-        document.getElementById('auth-menu-items').innerHTML = `<div class="dropdown-item" onclick="openAuthModal()">🔑 Accedi / Registrati</div>`;
-      }
-      renderNotifications();
-      initHomeData();
-    }
-
-    function openAuthModal() {
-      document.getElementById('dropdown-menu').classList.remove('show');
-      document.getElementById('auth-error').style.display = 'none';
-      document.getElementById('auth-modal').style.display = 'flex';
-    }
-    function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
-
-    function handleRegister() {
-      const user = document.getElementById('auth-username').value.trim();
-      const pass = document.getElementById('auth-password').value.trim();
-      if (!user || !pass) return showAuthError("Inserisci Username e Password.");
-      if (usersDb[user]) return showAuthError("Username già registrato.");
-      
-      usersDb[user] = { password: pass };
-      localStorage.setItem('binge_users_db', JSON.stringify(usersDb));
-      performLogin(user);
-      showToast(`Account registrato con successo! Benvenuto ${user}`);
-    }
-
-    function handleLogin() {
-      const user = document.getElementById('auth-username').value.trim();
-      const pass = document.getElementById('auth-password').value.trim();
-      if (usersDb[user] && usersDb[user].password === pass) {
-        performLogin(user);
-        showToast(`Bentornato, ${user}!`);
-      } else {
-        showAuthError("Username o Password errati.");
-      }
-    }
-
-    function performLogin(user) {
-      currentUser = user; 
-      localStorage.setItem('binge_current_user', currentUser);
-      closeAuthModal(); 
-      initUserSession();
-    }
-
-    function logout() {
-      currentUser = null; 
-      localStorage.removeItem('binge_current_user'); 
-      goHome(); 
-      initUserSession();
-      showToast("Disconnessione effettuata.");
-    }
-
-    function showAuthError(msg) {
-      const errEl = document.getElementById('auth-error');
-      errEl.innerText = msg; 
-      errEl.style.display = 'block';
-    }
-
-    // --- NOTIFICHE ---
-    function toggleNotifications() {
-      const drawer = document.getElementById('notif-drawer');
-      drawer.style.display = drawer.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function addNotification(animeTitle, message, type = 'info', animeId = null) {
-      if (!currentUser) return;
-      const notif = {
-        id: Date.now(),
-        animeTitle,
-        message,
-        type,
-        animeId,
-        date: new Date().toLocaleDateString('it-IT') + ' ' + new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'}),
-        unread: true
-      };
-      userNotifications.unshift(notif);
-      localStorage.setItem(`binge_notifs_${currentUser}`, JSON.stringify(userNotifications));
-      renderNotifications();
-    }
-
-    function renderNotifications() {
-      const countBadge = document.getElementById('notif-count');
-      const container = document.getElementById('notif-list-container');
-      
-      const unreadCount = userNotifications.filter(n => n.unread).length;
-      if (unreadCount > 0) {
-        countBadge.innerText = unreadCount;
-        countBadge.style.display = 'block';
-      } else {
-        countBadge.style.display = 'none';
-      }
-
-      if (userNotifications.length === 0) {
-        container.innerHTML = '<div style="color:#94a3b8; font-size:0.85rem; text-align:center; padding:15px;">Nessuna notifica presente.</div>';
-        return;
-      }
-
-      container.innerHTML = '';
-      userNotifications.forEach(n => {
-        const item = document.createElement('div');
-        item.className = `notif-item ${n.unread ? 'unread' : ''}`;
-        item.onclick = () => {
-          n.unread = false;
-          localStorage.setItem(`binge_notifs_${currentUser}`, JSON.stringify(userNotifications));
-          renderNotifications();
-          if (n.animeId) openDetails(n.animeId);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'binge-anime-tracker';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "demo-api-key",
+            authDomain: "demo-app.firebaseapp.com",
+            projectId: "demo-app",
+            storageBucket: "demo-app.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:123456"
         };
-        item.innerHTML = `
-          <div class="notif-item-title">${n.animeTitle}</div>
-          <div class="notif-item-desc">${n.message}</div>
-          <div class="notif-item-date">${n.date}</div>
-        `;
-        container.appendChild(item);
-      });
-    }
 
-    function clearAllNotifications() {
-      if (!currentUser) return;
-      userNotifications = [];
-      localStorage.setItem(`binge_notifs_${currentUser}`, JSON.stringify(userNotifications));
-      renderNotifications();
-      showToast("Notifiche svuotate.");
-    }
+        // Application State
+        let app, auth, db;
+        let currentUser = null;
+        let myFavorites = [];
+        let myNotifications = [];
+        let currentHeroIndex = 0;
+        let heroTimer = null;
+        let activeDetailAnime = null;
+        let selectedSeasonIndex = 0;
 
-    function simulateNotification() {
-      const anime = currentAnimeData.find(a => a.id === selectedAnimeId);
-      if (!anime) return;
-      const types = [
-        "🚀 È iniziata la Nuova Stagione!",
-        "🏁 Si è appena conclusa l'ultima stagione!",
-        "📢 Ufficialmente confermata una Nuova Stagione!"
-      ];
-      const randomMsg = types[Math.floor(Math.random() * types.length)];
-      addNotification(anime.title, randomMsg, 'simulated', anime.id);
-      showToast(`🔔 Notifica simulata per ${anime.title}`);
-    }
+        // On Window Load Initializer
+        window.onload = async function() {
+            initLocalStorage();
+            renderHero();
+            renderRows();
+            startHeroAutoSlide();
 
-    // --- CAROUSEL "RETTANGOLO GROSSO" ---
-    async function loadHeroCarousel() {
-      try {
-        const res = await fetch('https://kitsu.io/api/edge/anime?page[limit]=5&sort=-user_count');
-        const data = await res.json();
-        if (data.data && data.data.length > 0) {
-          heroAnimeList = data.data;
-          updateHeroDisplay(0);
-          if (heroInterval) clearInterval(heroInterval);
-          heroInterval = setInterval(() => nextHero(), 6000);
-        }
-      } catch (e) {}
-    }
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
 
-    function updateHeroDisplay(index) {
-      if (heroAnimeList.length === 0) return;
-      currentHeroIndex = index;
-      const item = heroAnimeList[currentHeroIndex];
-      const bgUrl = item.attributes.coverImage?.large || item.attributes.posterImage?.large || '';
-      
-      document.getElementById('hero-bg').style.backgroundImage = `url('${bgUrl}')`;
-      document.getElementById('hero-title').innerText = item.attributes.canonicalTitle;
-      document.getElementById('hero-desc').innerText = item.attributes.synopsis || "Nessuna descrizione.";
-      
-      const playBtn = document.getElementById('hero-play-btn');
-      playBtn.onclick = () => openDetails(item.id.toString());
-    }
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.warn("Firebase Auth fallback to local mode:", e);
+            }
 
-    function nextHero() {
-      let next = (currentHeroIndex + 1) % heroAnimeList.length;
-      updateHeroDisplay(next);
-    }
-    function prevHero() {
-      let prev = (currentHeroIndex - 1 + heroAnimeList.length) % heroAnimeList.length;
-      updateHeroDisplay(prev);
-    }
+            if (auth) {
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    updateUserUI();
+                    if (user) {
+                        setupFirestoreSync();
+                    }
+                });
+            }
+        };
 
-    // --- CARICAMENTO ANIME E HOME ROWS ---
-    function getAnimeBadge(status) {
-      const st = (status || '').toLowerCase();
-      if (st.includes('current') || st.includes('airing')) return { class: 'badge-blue', label: 'IN CORSO' };
-      if (st.includes('upcoming') || st.includes('unreleased')) return { class: 'badge-purple', label: 'IN ARRIVO' };
-      return { class: 'badge-green', label: 'COMPLETO' };
-    }
+        function initLocalStorage() {
+            const localFavs = localStorage.getItem('binge_favorites');
+            if (localFavs) myFavorites = JSON.parse(localFavs);
 
-    async function fetchKitsuCategory(queryUrl, elementId) {
-      try {
-        const res = await fetch(queryUrl);
-        const data = await res.json();
-        const items = data.data || [];
-        const container = document.getElementById(elementId);
-        if (!container) return;
-        container.innerHTML = '';
-
-        if (items.length === 0) {
-          container.innerHTML = '<div style="color:#94a3b8; font-size:0.85rem; padding:10px;">Nessun anime trovato.</div>';
-          return;
+            const localNotifs = localStorage.getItem('binge_notifications');
+            if (localNotifs) {
+                myNotifications = JSON.parse(localNotifs);
+            } else {
+                // Initial welcome notification
+                myNotifications = [{
+                    id: 'notif-welcome',
+                    title: 'Benvenuto su BINGE!',
+                    message: 'I giorni di uscita e i giorni della settimana sono ora visibili per tutti gli episodi!',
+                    time: 'Ora',
+                    read: false
+                }];
+                saveNotifications();
+            }
+            updateBadges();
         }
 
-        items.forEach((item) => {
-          const epCount = item.attributes.episodeCount ? `${item.attributes.episodeCount} Ep.` : 'In corso';
-          const anime = {
-            id: item.id.toString(),
-            title: item.attributes.canonicalTitle,
-            coverImage: item.attributes.posterImage?.small || item.attributes.posterImage?.original,
-            synopsis: item.attributes.synopsis || "Nessuna descrizione disponibile.",
-            episodes: epCount,
-            status: item.attributes.status
-          };
-
-          if(!currentAnimeData.find(a => a.id === anime.id)) currentAnimeData.push(anime);
-          
-          const badge = getAnimeBadge(anime.status);
-          const card = document.createElement('div');
-          card.className = 'netflix-card';
-          card.onclick = () => openDetails(anime.id);
-          card.innerHTML = `
-            <img src="${anime.coverImage}" alt="${anime.title}" loading="lazy">
-            <div class="status-badge ${badge.class}">${badge.label}</div>
-            <div class="card-title">${anime.title}</div>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) { console.error("Errore:", err); }
-    }
-
-    function renderFavoritesRow() {
-      const container = document.getElementById('row-favorites');
-      container.innerHTML = '';
-      if (!currentUser) {
-        container.innerHTML = '<div style="color:#94a3b8; font-size:0.85rem; padding:10px; cursor:pointer;" onclick="openAuthModal()">⚠️ Accedi per salvare i preferiti.</div>';
-        return;
-      }
-      if (savedList.length === 0) {
-        container.innerHTML = '<div style="color:#94a3b8; font-size:0.85rem; padding:10px;">Nessun anime nei preferiti.</div>';
-        return;
-      }
-      savedList.forEach(anime => {
-        if(!currentAnimeData.find(a => a.id === anime.id)) currentAnimeData.push(anime);
-        const badge = getAnimeBadge(anime.status);
-        const card = document.createElement('div');
-        card.className = 'netflix-card';
-        card.onclick = () => openDetails(anime.id);
-        card.innerHTML = `
-          <img src="${anime.coverImage}" alt="${anime.title}">
-          <div class="status-badge ${badge.class}">${badge.label}</div>
-          <div class="card-title">${anime.title}</div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function initHomeData() {
-      currentAnimeData = [];
-      loadHeroCarousel();
-      
-      // 1ª RIGA: Nuove Uscite
-      fetchKitsuCategory('https://kitsu.io/api/edge/anime?filter[status]=current&sort=-startDate&page[limit]=15', 'row-new-releases');
-      
-      // 2ª RIGA: Preferiti
-      renderFavoritesRow();
-      
-      // 3ª RIGA: Consigliati per Te
-      if (savedList.length > 0) {
-        const keyword = encodeURIComponent(savedList[savedList.length - 1].title.split(' ')[0]);
-        fetchKitsuCategory(`https://kitsu.io/api/edge/anime?filter[text]=${keyword}&page[limit]=10`, 'row-ai-recommendations');
-      } else {
-        fetchKitsuCategory('https://kitsu.io/api/edge/anime?page[limit]=10&sort=-average_rating', 'row-ai-recommendations');
-      }
-
-      // 4ª RIGA: Popolari
-      fetchKitsuCategory('https://kitsu.io/api/edge/anime?page[limit]=15&sort=popularityRank', 'row-top-ita');
-    }
-
-    // --- RICERCA E FILTRI ---
-    function handleSearch() {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        const query = document.getElementById('search-input').value.trim();
-        document.getElementById('year-select').value = '';
-        const searchSection = document.getElementById('searchResultsSection');
-        const mainRows = document.getElementById('mainRows');
-        const hero = document.getElementById('hero-banner');
-
-        if (!query) { 
-          searchSection.style.display = 'none'; 
-          mainRows.style.display = 'block'; 
-          hero.style.display = 'block'; 
-          return; 
-        }
-        
-        searchSection.style.display = 'block'; 
-        mainRows.style.display = 'none';
-        hero.style.display = 'none';
-        document.getElementById('search-title').innerText = `Risultati Ricerca: "${query}"`;
-        fetchKitsuCategory(`https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(query)}&page[limit]=20`, 'search-grid');
-      }, 400);
-    }
-
-    function filterByYear() {
-      const year = document.getElementById('year-select').value;
-      const searchSection = document.getElementById('searchResultsSection');
-      const mainRows = document.getElementById('mainRows');
-      const hero = document.getElementById('hero-banner');
-
-      if (!year) { 
-        searchSection.style.display = 'none'; 
-        mainRows.style.display = 'block'; 
-        hero.style.display = 'block'; 
-        return; 
-      }
-
-      searchSection.style.display = 'block'; 
-      mainRows.style.display = 'none';
-      hero.style.display = 'none';
-      document.getElementById('search-title').innerText = `Anime Annata (${year})`;
-      fetchKitsuCategory(`https://kitsu.io/api/edge/anime?filter[seasonYear]=${year}&page[limit]=20&sort=-user_count`, 'search-grid');
-    }
-
-    // --- DETTAGLIO FULL PAGE & FRANCHISING ---
-    async function openDetails(id) {
-      let anime = currentAnimeData.find(a => a.id === id);
-      if (!anime) {
-        try {
-          const res = await fetch(`https://kitsu.io/api/edge/anime/${id}`);
-          const data = await res.json();
-          if (data.data) {
-            anime = {
-              id: data.data.id.toString(),
-              title: data.data.attributes.canonicalTitle,
-              coverImage: data.data.attributes.posterImage?.small || data.data.attributes.posterImage?.original,
-              synopsis: data.data.attributes.synopsis || "Nessuna descrizione.",
-              episodes: data.data.attributes.episodeCount ? `${data.data.attributes.episodeCount} Ep.` : 'In corso',
-              status: data.data.attributes.status
-            };
-            currentAnimeData.push(anime);
-          }
-        } catch(e) {}
-      }
-      if (!anime) return;
-
-      selectedAnimeId = id;
-      document.getElementById('detail-title').innerText = anime.title;
-      document.getElementById('detail-poster').src = anime.coverImage;
-      document.getElementById('detail-episodes').innerText = `📺 ${anime.episodes || 'N.D.'}`;
-      document.getElementById('detail-status').innerText = `🟢 ${(anime.status || 'N.D.').toUpperCase()}`;
-      document.getElementById('detail-description').innerText = anime.synopsis;
-
-      const saveBtn = document.getElementById('save-btn');
-      if (!currentUser) {
-        saveBtn.innerText = "🔒 Accedi per Salvare";
-        saveBtn.onclick = () => openAuthModal();
-      } else {
-        const isSaved = savedList.some(item => item.id === id);
-        saveBtn.innerText = isSaved ? "❌ Rimuovi dai Preferiti" : "➕ Aggiungi ai Preferiti";
-        saveBtn.onclick = toggleSaveAnime;
-      }
-
-      showDetailsPage();
-      loadKitsuGenres(id);
-      loadKitsuEpisodes(id);
-      loadFranchiseSeasons(anime.title);
-    }
-
-    async function loadFranchiseSeasons(title) {
-      const tabsContainer = document.getElementById('seasons-tabs');
-      tabsContainer.style.display = 'none';
-      tabsContainer.innerHTML = '';
-
-      const cleanTitle = title.split(':')[0].split(' ')[0];
-      if (cleanTitle.length < 3) return;
-
-      try {
-        const res = await fetch(`https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(cleanTitle)}&page[limit]=6`);
-        const data = await res.json();
-        if (data.data && data.data.length > 1) {
-          tabsContainer.style.display = 'flex';
-          data.data.forEach((item, idx) => {
-            const tab = document.createElement('div');
-            tab.className = `season-tab ${item.id.toString() === selectedAnimeId ? 'active' : ''}`;
-            tab.innerText = item.attributes.canonicalTitle;
-            tab.onclick = () => openDetails(item.id.toString());
-            tabsContainer.appendChild(tab);
-          });
-        }
-      } catch(e) {}
-    }
-
-    async function loadKitsuGenres(id) {
-      try {
-        const res = await fetch(`https://kitsu.io/api/edge/anime/${id}/categories`);
-        const data = await res.json();
-        const container = document.getElementById('detail-genres');
-        container.innerHTML = '';
-        if (data.data) {
-          data.data.slice(0, 5).forEach(c => {
-            const t = document.createElement('span'); t.className = 'genre-tag'; t.innerText = c.attributes.title; container.appendChild(t);
-          });
-        }
-      } catch (e) {}
-    }
-
-    async function loadKitsuEpisodes(id) {
-      const container = document.getElementById('detail-episodes-list');
-      container.innerHTML = '<div style="color:#94a3b8;">Caricamento puntate...</div>';
-      try {
-        const res = await fetch(`https://kitsu.io/api/edge/anime/${id}/episodes?page[limit]=50`);
-        const data = await res.json();
-        container.innerHTML = '';
-        
-        if (data.data && data.data.length > 0) {
-          data.data.forEach(ep => {
-            const num = ep.attributes.number || '-';
-            const title = ep.attributes.canonicalTitle || `Episodio ${num}`;
-            const date = ep.attributes.airdate ? new Date(ep.attributes.airdate).toLocaleDateString('it-IT') : 'N.D.';
-            container.innerHTML += `<div class="episode-card"><span class="ep-title">Ep. ${num}: ${title}</span><span class="ep-date">📅 ${date}</span></div>`;
-          });
-        } else {
-          // Generatore Fallback garantito
-          for (let i = 1; i <= 12; i++) {
-            container.innerHTML += `<div class="episode-card"><span class="ep-title">Episodio ${i}</span><span class="ep-date">Disponibile</span></div>`;
-          }
-        }
-      } catch (e) { 
-        container.innerHTML = '';
-        for (let i = 1; i <= 12; i++) {
-          container.innerHTML += `<div class="episode-card"><span class="ep-title">Episodio ${i}</span><span class="ep-date">Disponibile</span></div>`;
-        }
-      }
-    }
-
-    function toggleSaveAnime() {
-      if (!currentUser) return;
-      const anime = currentAnimeData.find(a => a.id === selectedAnimeId);
-      if (!anime) return;
-
-      const index = savedList.findIndex(item => item.id === selectedAnimeId);
-      if (index > -1) {
-        savedList.splice(index, 1);
-        document.getElementById('save-btn').innerText = "➕ Aggiungi ai Preferiti";
-        showToast("Rimosso dai preferiti.");
-      } else {
-        savedList.push(anime);
-        document.getElementById('save-btn').innerText = "❌ Rimuovi dai Preferiti";
-        addNotification(anime.title, "➕ Aggiunto ai tuoi anime preferiti!", 'favorite_add', anime.id);
-        showToast("Aggiunto ai preferiti!");
-      }
-      localStorage.setItem(`binge_saved_${currentUser}`, JSON.stringify(savedList));
-      renderFavoritesRow();
-    }
-
-    // --- IMPORT & EXPORT PREFERITI ---
-    function exportHistory() {
-      if (savedList.length === 0) return showToast("Nessun anime da esportare.");
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedList, null, 2));
-      const a = document.createElement('a'); 
-      a.href = dataStr; 
-      a.download = `preferiti_${currentUser}.json`;
-      document.body.appendChild(a); 
-      a.click(); 
-      a.remove(); 
-      toggleMenu();
-    }
-    function triggerImport() { document.getElementById('import-file').click(); toggleMenu(); }
-    
-    function importHistory(event) {
-      const file = event.target.files[0]; 
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const importedData = JSON.parse(e.target.result);
-          if (Array.isArray(importedData)) {
-            const existingIds = new Set(savedList.map(a => a.id));
-            const filteredNew = importedData.filter(a => a.id && !existingIds.has(a.id));
-            savedList = [...savedList, ...filteredNew];
-            localStorage.setItem(`binge_saved_${currentUser}`, JSON.stringify(savedList));
-            showToast(`Importati ${filteredNew.length} anime nei preferiti!`);
+        function saveFavorites() {
+            localStorage.setItem('binge_favorites', JSON.stringify(myFavorites));
+            updateBadges();
             renderFavoritesRow();
-          }
-        } catch (err) { showToast("File non valido."); }
-      };
-      reader.readAsText(file);
-    }
+            if (currentUser && db) {
+                try {
+                    const favDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'userData', 'favorites');
+                    setDoc(favDocRef, { list: myFavorites }, { merge: true });
+                } catch(err) { console.error("Firestore Save Error:", err); }
+            }
+        }
 
-    // AVVIO APPLICAZIONE
-    initUserSession();
-  </script>
+        function saveNotifications() {
+            localStorage.setItem('binge_notifications', JSON.stringify(myNotifications));
+            updateBadges();
+            renderNotificationsList();
+            if (currentUser && db) {
+                try {
+                    const notifDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'userData', 'notifications');
+                    setDoc(notifDocRef, { list: myNotifications }, { merge: true });
+                } catch(err) { console.error("Firestore Notif Save Error:", err); }
+            }
+        }
+
+        function setupFirestoreSync() {
+            if (!currentUser || !db) return;
+
+            // Sync Favorites Realtime
+            const favDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'userData', 'favorites');
+            onSnapshot(favDocRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().list) {
+                    myFavorites = docSnap.data().list;
+                    localStorage.setItem('binge_favorites', JSON.stringify(myFavorites));
+                    updateBadges();
+                    renderFavoritesRow();
+                    if (activeDetailAnime) updateDetailFavButton();
+                }
+            }, (err) => console.log("Fav sync notice:", err));
+
+            // Sync Notifications Realtime
+            const notifDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'userData', 'notifications');
+            onSnapshot(notifDocRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().list) {
+                    myNotifications = docSnap.data().list;
+                    localStorage.setItem('binge_notifications', JSON.stringify(myNotifications));
+                    updateBadges();
+                    renderNotificationsList();
+                }
+            }, (err) => console.log("Notif sync notice:", err));
+        }
+
+        function renderHero() {
+            const featuredList = ANIME_DATABASE.filter(a => a.featured);
+            if (!featuredList.length) return;
+
+            const anime = featuredList[currentHeroIndex % featuredList.length];
+
+            document.getElementById('heroBackdrop').style.backgroundImage = `url('${anime.backdrop}')`;
+            document.getElementById('heroTitle').innerText = anime.title;
+            document.getElementById('heroSynopsis').innerText = anime.synopsis;
+            document.getElementById('heroRating').innerText = anime.rating;
+            document.getElementById('heroYear').innerText = anime.year;
+            document.getElementById('heroGenres').innerText = anime.genres.join(' • ');
+
+            // Status Badge Colors
+            const statusBadge = document.getElementById('heroStatusBadge');
+            statusBadge.innerText = getStatusLabel(anime.status);
+            statusBadge.className = `px-2.5 py-1 text-xs font-bold rounded-md uppercase tracking-wider text-white ${getStatusClass(anime.status)}`;
+
+            // Detail button click
+            document.getElementById('heroDetailBtn').onclick = () => openDetailView(anime.id);
+            
+            // Fav button state
+            const isFav = myFavorites.includes(anime.id);
+            const favBtn = document.getElementById('heroFavBtn');
+            favBtn.innerHTML = isFav 
+                ? `<i class="fa-solid fa-heart text-rose-500"></i> <span>Nei Preferiti</span>`
+                : `<i class="fa-regular fa-heart text-sky-400"></i> <span>Preferiti</span>`;
+            favBtn.onclick = () => toggleFavorite(anime.id);
+
+            // Render Dots
+            const dotsContainer = document.getElementById('heroDots');
+            dotsContainer.innerHTML = featuredList.map((_, idx) => `
+                <button onclick="setHeroSlide(${idx})" class="w-2.5 h-2.5 rounded-full transition-all ${idx === currentHeroIndex ? 'bg-sky-400 w-6' : 'bg-slate-600 hover:bg-slate-400'}"></button>
+            `).join('');
+        }
+
+        function startHeroAutoSlide() {
+            clearInterval(heroTimer);
+            heroTimer = setInterval(() => {
+                nextHeroSlide();
+            }, 6000); // 6s Auto-slide
+        }
+
+        window.nextHeroSlide = function() {
+            const featuredList = ANIME_DATABASE.filter(a => a.featured);
+            currentHeroIndex = (currentHeroIndex + 1) % featuredList.length;
+            renderHero();
+        };
+
+        window.prevHeroSlide = function() {
+            const featuredList = ANIME_DATABASE.filter(a => a.featured);
+            currentHeroIndex = (currentHeroIndex - 1 + featuredList.length) % featuredList.length;
+            renderHero();
+        };
+
+        window.setHeroSlide = function(idx) {
+            currentHeroIndex = idx;
+            renderHero();
+            startHeroAutoSlide();
+        };
+
+        function getStatusLabel(status) {
+            if (status === 'IN CORSO') return '🔵 IN CORSO';
+            if (status === 'COMPLETO') return '🟢 COMPLETO';
+            if (status === 'IN ARRIVO') return '🟣 IN ARRIVO';
+            return status;
+        }
+
+        function getStatusClass(status) {
+            if (status === 'IN CORSO') return 'bg-blue-600/90 shadow-md shadow-blue-500/20';
+            if (status === 'COMPLETO') return 'bg-emerald-600/90 shadow-md shadow-emerald-500/20';
+            if (status === 'IN ARRIVO') return 'bg-purple-600/90 shadow-md shadow-purple-500/20';
+            return 'bg-slate-700';
+        }
+
+        function renderRows() {
+            // Row 1: 🌟 Nuove Uscite
+            const nuoveUscite = ANIME_DATABASE.filter(a => a.status === 'IN CORSO' || a.year === '2024');
+            renderCardGrid('grid-nuove-uscite', nuoveUscite);
+
+            // Row 2: ❤️ I Tuoi Preferiti
+            renderFavoritesRow();
+
+            // Row 3: 🤖 Consigliati per Te
+            const consigliati = [...ANIME_DATABASE].sort((a,b) => parseFloat(b.rating) - parseFloat(a.rating)).slice(0, 5);
+            renderCardGrid('grid-consigliati', consigliati);
+
+            // Row 4: 🔥 I Popolari del Momento
+            const popolari = [...ANIME_DATABASE].reverse();
+            renderCardGrid('grid-popolari', popolari);
+        }
+
+        function renderFavoritesRow() {
+            const favAnimeList = ANIME_DATABASE.filter(a => myFavorites.includes(a.id));
+            const grid = document.getElementById('grid-preferiti');
+            
+            if (favAnimeList.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-slate-900/60 border border-dashed border-slate-800 rounded-2xl p-6 text-center space-y-3">
+                        <i class="fa-solid fa-heart-crack text-3xl text-slate-600"></i>
+                        <p class="text-sm text-slate-400">Nessun anime nei tuoi preferiti.</p>
+                        <p class="text-xs text-slate-500">Clicca sul cuore ❤️ su qualsiasi poster per salvarlo e ritrovarlo qui da qualsiasi dispositivo!</p>
+                    </div>
+                `;
+            } else {
+                renderCardGrid('grid-preferiti', favAnimeList);
+            }
+
+            // Also update full favorites page grid
+            const fullGrid = document.getElementById('fullFavoritesGrid');
+            if (fullGrid) {
+                if (favAnimeList.length === 0) {
+                    fullGrid.innerHTML = `<p class="col-span-full text-slate-400 text-center py-12">Nessun preferito salvato.</p>`;
+                } else {
+                    renderCardGrid('fullFavoritesGrid', favAnimeList);
+                }
+            }
+        }
+
+        function renderCardGrid(containerId, list) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = list.map(anime => {
+                const isFav = myFavorites.includes(anime.id);
+                return `
+                    <div class="group relative bg-cardBg rounded-2xl overflow-hidden border border-slate-800 card-hover flex flex-col justify-between cursor-pointer"
+                         onclick="openDetailView('${anime.id}')">
+                        
+                        <!-- Poster Container -->
+                        <div class="relative aspect-[2/3] w-full overflow-hidden bg-slate-900">
+                            <img src="${anime.poster}" alt="${anime.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent opacity-80"></div>
+
+                            <!-- Colored Status Badge -->
+                            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 text-[10px] font-bold rounded-md uppercase tracking-wider text-white ${getStatusClass(anime.status)}">
+                                ${getStatusLabel(anime.status)}
+                            </span>
+
+                            <!-- Favorite Heart Icon Button -->
+                            <button onclick="event.stopPropagation(); toggleFavorite('${anime.id}')" 
+                                    class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 flex items-center justify-center text-white transition backdrop-blur-sm">
+                                <i class="${isFav ? 'fa-solid fa-heart text-rose-500' : 'fa-regular fa-heart text-slate-300'} text-xs"></i>
+                            </button>
+
+                            <!-- Bottom Rating & Year Overlay -->
+                            <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-xs font-semibold text-slate-200">
+                                <span class="bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
+                                    <i class="fa-solid fa-star text-[10px] text-amber-400"></i> ${anime.rating}
+                                </span>
+                                <span class="text-slate-400 text-[11px]">${anime.year}</span>
+                            </div>
+                        </div>
+
+                        <!-- Card Body Info -->
+                        <div class="p-3 space-y-1">
+                            <h3 class="font-bold text-sm text-slate-100 group-hover:text-sky-400 transition line-clamp-1">
+                                ${anime.title}
+                            </h3>
+                            <p class="text-[11px] text-slate-400 line-clamp-1">
+                                ${anime.genres.slice(0,2).join(', ')}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.openDetailView = function(animeId) {
+            const anime = ANIME_DATABASE.find(a => a.id === animeId);
+            if (!anime) return;
+
+            activeDetailAnime = anime;
+            selectedSeasonIndex = 0;
+
+            document.getElementById('detailPoster').src = anime.poster;
+            document.getElementById('detailBackdrop').style.backgroundImage = `url('${anime.backdrop}')`;
+            document.getElementById('detailTitle').innerText = anime.title;
+            document.getElementById('detailRating').innerText = anime.rating;
+            document.getElementById('detailYear').innerText = anime.year;
+            document.getElementById('detailStudio').innerText = anime.studio;
+            document.getElementById('detailSynopsis').innerText = anime.synopsis;
+
+            // Status Badge
+            const statusBadge = document.getElementById('detailStatusBadge');
+            statusBadge.innerText = getStatusLabel(anime.status);
+            statusBadge.className = `px-3 py-1 text-xs font-bold rounded-lg uppercase tracking-wider text-white ${getStatusClass(anime.status)}`;
+
+            // Genres
+            document.getElementById('detailGenres').innerHTML = anime.genres.map(g => 
+                `<span class="bg-slate-800 text-sky-400 border border-slate-700 px-2.5 py-1 rounded-lg">${g}</span>`
+            ).join('');
+
+            // Favorite Button Setup
+            updateDetailFavButton();
+
+            // Simulate Notification Trigger Setup
+            document.getElementById('detailSimulateNotifBtn').onclick = () => simulateEpisodeNotif(anime);
+
+            // Render Seasons Tabs and Episodes
+            renderSeasonTabs();
+            renderEpisodes();
+
+            // Switch Views
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-favorites').classList.add('hidden');
+            document.getElementById('view-detail').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.closeDetailView = function() {
+            document.getElementById('view-detail').classList.add('hidden');
+            document.getElementById('view-home').classList.remove('hidden');
+            activeDetailAnime = null;
+        };
+
+        function updateDetailFavButton() {
+            if (!activeDetailAnime) return;
+            const isFav = myFavorites.includes(activeDetailAnime.id);
+            const btn = document.getElementById('detailFavToggleBtn');
+            btn.innerHTML = isFav 
+                ? `<i class="fa-solid fa-heart text-rose-500"></i> <span>Rimuovi dai Preferiti</span>`
+                : `<i class="fa-solid fa-heart"></i> <span>Aggiungi ai Preferiti</span>`;
+            btn.onclick = () => {
+                toggleFavorite(activeDetailAnime.id);
+                updateDetailFavButton();
+            };
+        }
+
+        function renderSeasonTabs() {
+            if (!activeDetailAnime || !activeDetailAnime.seasons) return;
+            const container = document.getElementById('seasonTabsContainer');
+            
+            container.innerHTML = activeDetailAnime.seasons.map((season, idx) => `
+                <button onclick="selectSeason(${idx})" 
+                        class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition border ${
+                            idx === selectedSeasonIndex 
+                            ? 'bg-sky-500 text-slate-950 border-sky-400 shadow-md shadow-sky-500/20' 
+                            : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700'
+                        }">
+                    ${season.name}
+                </button>
+            `).join('');
+        }
+
+        window.selectSeason = function(idx) {
+            selectedSeasonIndex = idx;
+            renderSeasonTabs();
+            renderEpisodes();
+        };
+
+        function renderEpisodes() {
+            if (!activeDetailAnime || !activeDetailAnime.seasons) return;
+            const season = activeDetailAnime.seasons[selectedSeasonIndex] || activeDetailAnime.seasons[0];
+            const listContainer = document.getElementById('episodesList');
+
+            if (!season || !season.episodes.length) {
+                listContainer.innerHTML = `<p class="text-slate-400 text-sm py-4">Nessun episodio registrato.</p>`;
+                return;
+            }
+
+            listContainer.innerHTML = season.episodes.map(ep => `
+                <div class="bg-cardBg border border-slate-800 hover:border-sky-500/40 rounded-2xl p-4 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="space-y-1.5 flex-1">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <span class="text-xs font-extrabold text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-md border border-sky-500/20">
+                                ${ep.number}
+                            </span>
+                            <h4 class="font-bold text-slate-100 text-base">${ep.title}</h4>
+                        </div>
+                        <p class="text-xs text-slate-400 line-clamp-2">${ep.overview}</p>
+                    </div>
+
+                    <!-- RESTORED EXPLICIT RELEASE AIR DATE WITH WEEKDAY IN ITALIAN -->
+                    <div class="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 border-slate-800 pt-2 sm:pt-0 shrink-0">
+                        <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700/80 text-sky-300 font-semibold text-xs">
+                            <i class="fa-regular fa-calendar-days text-sky-400"></i>
+                            <span>${ep.airDate}</span>
+                        </div>
+                        <span class="text-[11px] text-slate-400 mt-1">${ep.duration}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function simulateEpisodeNotif(anime) {
+            const notif = {
+                id: 'notif-' + Date.now(),
+                title: `🔔 Nuovo Episodio Rilasciato!`,
+                message: `${anime.title}: Il nuovo episodio è ora disponibile con data di uscita aggiornata!`,
+                time: 'Adesso',
+                read: false
+            };
+            myNotifications.unshift(notif);
+            saveNotifications();
+            showToast(`🔔 Simulazione Inviata: Nuovo episodio per ${anime.title}`);
+        }
+
+        window.toggleNotificationsDrawer = function() {
+            const drawer = document.getElementById('notificationsDrawer');
+            drawer.classList.toggle('translate-x-full');
+            
+            // Mark all as read when opening
+            if (!drawer.classList.contains('translate-x-full')) {
+                myNotifications.forEach(n => n.read = true);
+                saveNotifications();
+            }
+        };
+
+        function renderNotificationsList() {
+            const container = document.getElementById('notificationsList');
+            if (!myNotifications.length) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-8">Nessuna notifica presente.</p>`;
+                return;
+            }
+
+            container.innerHTML = myNotifications.map(n => `
+                <div class="p-3 rounded-xl bg-slate-800/90 border ${n.read ? 'border-slate-800' : 'border-sky-500/40 bg-sky-950/20'} space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-sky-300">${n.title}</span>
+                        <span class="text-[10px] text-slate-400">${n.time}</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-snug">${n.message}</p>
+                </div>
+            `).join('');
+        }
+
+        window.clearAllNotifications = function() {
+            myNotifications = [];
+            saveNotifications();
+            showToast("Notifiche svuotate");
+        };
+
+        window.toggleFavorite = function(animeId) {
+            const index = myFavorites.indexOf(animeId);
+            const anime = ANIME_DATABASE.find(a => a.id === animeId);
+            
+            if (index === -1) {
+                myFavorites.push(animeId);
+                showToast(`❤️ Aggiunto ai Preferiti: ${anime ? anime.title : ''}`);
+            } else {
+                myFavorites.splice(index, 1);
+                showToast(`💔 Rimosso dai Preferiti`);
+            }
+            saveFavorites();
+            renderHero();
+            renderRows();
+        };
+
+        function updateBadges() {
+            const favBadge = document.getElementById('favCountBadge');
+            if (favBadge) favBadge.innerText = myFavorites.length;
+
+            const unreadNotifs = myNotifications.filter(n => !n.read).length;
+            const notifBadge = document.getElementById('notifBadge');
+            if (notifBadge) {
+                if (unreadNotifs > 0) {
+                    notifBadge.innerText = unreadNotifs;
+                    notifBadge.classList.remove('hidden');
+                } else {
+                    notifBadge.classList.add('hidden');
+                }
+            }
+        }
+
+        window.handleSearch = function(query) {
+            query = query.toLowerCase().trim();
+            if (!query) {
+                renderRows();
+                return;
+            }
+
+            const filtered = ANIME_DATABASE.filter(a => 
+                a.title.toLowerCase().includes(query) || 
+                a.genres.some(g => g.toLowerCase().includes(query)) ||
+                a.studio.toLowerCase().includes(query)
+            );
+
+            renderCardGrid('grid-nuove-uscite', filtered);
+        };
+
+        window.navigateTo = function(target) {
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-favorites').classList.add('hidden');
+            document.getElementById('view-detail').classList.add('hidden');
+
+            if (target === 'home') {
+                document.getElementById('view-home').classList.remove('hidden');
+            } else if (target === 'favorites') {
+                document.getElementById('view-favorites').classList.remove('hidden');
+                renderFavoritesRow();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.scrollToSection = function(id) {
+            navigateTo('home');
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        };
+
+        window.openAuthModal = function() {
+            document.getElementById('authModal').classList.remove('hidden');
+            updateUserUI();
+        };
+
+        window.closeAuthModal = function() {
+            document.getElementById('authModal').classList.add('hidden');
+        };
+
+        function updateUserUI() {
+            const uidText = document.getElementById('currentUserIdText');
+            const syncDot = document.getElementById('syncDot');
+            const syncText = document.getElementById('syncText');
+            
+            if (currentUser) {
+                const displayId = currentUser.email || currentUser.uid;
+                if (uidText) uidText.innerText = displayId;
+                if (syncDot) syncDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+                if (syncText) syncText.innerText = currentUser.email ? currentUser.email.split('@')[0] : "Cloud Attivo";
+            } else {
+                if (uidText) uidText.innerText = "Non autenticato (Modalità Locale)";
+                if (syncDot) syncDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
+                if (syncText) syncText.innerText = "Locale";
+            }
+        }
+
+        window.copyUserId = function() {
+            if (!currentUser) return;
+            const text = currentUser.email || currentUser.uid;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("📋 ID Utente copiato negli appunti!");
+            }).catch(() => {
+                // Fallback
+                showToast("📋 ID: " + text);
+            });
+        };
+
+        window.handleLogin = async function() {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+
+            if (!email || !password) {
+                showToast("⚠️ Inserisci email e password");
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showToast("🟢 Accesso effettuato! Sincronizzazione in corso...");
+                closeAuthModal();
+            } catch (err) {
+                showToast("❌ Errore accesso: " + err.message);
+            }
+        };
+
+        window.handleRegister = async function() {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+
+            if (!email || !password || password.length < 6) {
+                showToast("⚠️ Password minima 6 caratteri");
+                return;
+            }
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                showToast("🎉 Account creato! Sincronizzazione multi-dispositivo attiva.");
+                closeAuthModal();
+            } catch (err) {
+                showToast("❌ Errore registrazione: " + err.message);
+            }
+        };
+
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = "animate-toast bg-slate-900 border border-sky-500/50 text-slate-100 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-md pointer-events-auto";
+            toast.innerHTML = `
+                <i class="fa-solid fa-circle-info text-sky-400"></i>
+                <span class="text-xs font-semibold">${msg}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+    </script>
 </body>
 </html>
